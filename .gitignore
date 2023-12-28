@@ -9,3 +9,9 @@ devenv.local.nix
 # pre-commit
 .pre-commit-config.yaml
 
+/**/build
+/**/dist
+/**/*.so
+/**/*.dylib
+/**/*.dll
+.DS_Store

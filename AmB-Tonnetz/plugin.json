@@ -1,0 +1,23 @@
+{
+  "slug": "AmB-Tonnetz",
+  "name": "AmB-Tonnetz",
+  "version": "2.0.0",
+  "license": "proprietary",
+  "brand": "AmB-Tonnetz",
+  "author": "",
+  "authorEmail": "",
+  "authorUrl": "",
+  "pluginUrl": "",
+  "manualUrl": "",
+  "sourceUrl": "",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": [
+    {
+      "slug": "AmB-Tonnetz",
+      "name": "AmB-Tonnetz",
+      "description": "",
+      "tags": []
+    }
+  ]
+}
