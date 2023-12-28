@@ -1,52 +1,66 @@
 { pkgs, ... }:
 
-let 
-  python310Withoverrides = pkgs.python310.override {
-    packageOverrides = _: _: {
-    };
+# let
+#   python310Withoverrides = pkgs.python310.override {
+#     packageOverrides = _: _: { };
 
-  };
+#   };
 
-in
+# in 
 {
   # https://devenv.sh/basics/
-  env.GREET = "devenv";
-  # TODO: this uses mac-arch64 
-  
-  env.RACK_DIR =(builtins.getEnv "PWD") + "/sdk/Rack-SDK";
+  env = {
+    GREET = "devenv";
+    # TODO: this uses mac-arch64 
+    # TODO: nix-shell -p vcv-rack
 
+    RACK_DIR = (builtins.getEnv "PWD") + "/sdk/Rack-SDK";
+    DATA_DIR = (builtins.getEnv "PWD") + "/data";
+    DEVENV_FLAGS =
+      "-I ${pkgs.nlohmann_json}/include $(cat ${pkgs.stdenv.cc}/nix-support/cc-cflags) $(cat ${pkgs.stdenv.cc}/nix-support/libcxx-cxxflags) $(cat ${pkgs.stdenv.cc}/nix-support/libc-cflags)";
+  };
   # https://devenv.sh/packages/
-  packages = [  pkgs.git
-    pkgs.clang
-    pkgs.stdenv.cc.cc.lib
-    pkgs.cmake
+  packages = [
     pkgs.nixfmt
+    pkgs.makeWrapper
+    pkgs.pkg-config
+    pkgs.libclang
+    pkgs.jq
+    pkgs.nlohmann_json
   ];
 
   # https://devenv.sh/scripts/
   scripts.hello.exec = "echo hello from $GREET";
 
+  scripts.test.exec =
+    " g++ -o AmmannBeeknerTileUITest AmB-Tonnetz/src/am.cpp -I ${pkgs.nlohmann_json} -lstdc++fs -lm";
+
   enterShell = ''
     hello
+    echo ${pkgs.nlohmann_json}
+    echo ${pkgs.libclang}
+    cat ${pkgs.stdenv.cc}/nix-support/cc-cflags
+    cat ${pkgs.stdenv.cc}/nix-support/libc-cflags
+    cat ${pkgs.stdenv.cc}/nix-support/libcxx-cxxflags
     git --version
   '';
 
   languages.nix.enable = true;
   languages.cplusplus.enable = true;
-  languages.c.enable = true;
-  languages.idris.enable = true;
-  languages.python = {
-    enable = true;
-    poetry.enable = true;
-    package = pkgs.lib.mkForce python310Withoverrides;
-  };
+  # languages.c.enable = true;
+  # languages.idris.enable = true;
+  # languages.python = {
+  #   enable = true;
+  #   poetry.enable = true;
+  #   package = pkgs.lib.mkForce python310Withoverrides;
+  # };
 
   pre-commit.hooks = {
     # lint shell scripts
     shellcheck.enable = true;
     # format Python code
-    black.enable = true;
-    flake8.enable = true;
+    # black.enable = true;
+    # flake8.enable = true;
     # lint nix
     nixfmt.enable = true;
     deadnix = {
@@ -64,16 +78,14 @@ in
     # cabal-fmt.enable = true;ex
     # # lint haskell 
     # hlint.enable = true;
-    clang-format.enable =true;
+    clang-format.enable = true;
   };
 
   # https://devenv.sh/processes/
   # processes.ping.exec = "ping example.com";
-  processes.jupyterlab.exec =
-    "jupyter lab --notebook-dir=./src/test-py/notebooks";
+  # processes.jupyterlab.exec =
+  #   "jupyter lab --notebook-dir=./src/test-py/notebooks";
   # See full reference at https://devenv.sh/reference/options/
-
-
 
   # https://devenv.sh/languages/
   # languages.nix.enable = true;
