@@ -20,5 +20,24 @@ DISTRIBUTABLES += res
 DISTRIBUTABLES += $(wildcard LICENSE*)
 DISTRIBUTABLES += $(wildcard presets)
 
+
+# Test-related configurations
+TEST_SOURCES := $(wildcard src/tps.cpp)  # Adjust with your test file location
+TEST_FLAGS := -DTEST -Isrc  # Define TEST, and include the src directory if needed
+TEST_BINARY := test  # Name of the test binary
+
+
+# Test suite target
+test: FLAGS += $(TEST_FLAGS) 
+test: CXXFLAGS += -Wl,-rpath,/Users/timpierson/arity/am-vcv/sdk/Rack-SDK -L/Users/timpierson/arity/am-vcv/sdk/Rack-SDK -lRack -undefined dynamic_lookup -stdlib=libc++ -mmacosx-version-min=10.9 ${DEVENV_FLAGS}
+# test: LDFLAGS += 
+test: $(TEST_SOURCES)
+	$(CXX) $(FLAGS) $(CXXFLAGS) -o $(TEST_BINARY) $(TEST_SOURCES)
+	otool -L $(TEST_BINARY)
+	ls -l $(TEST_BINARY) # List the file to confirm it's created
+	export DYLD_LIBRARY_PATH=/Users/timpierson/arity/am-vcv/sdk/Rack-SDK:$DYLD_LIBRARY_PATH
+	./$(TEST_BINARY) && (rm -f $(TEST_BINARY) test.d)
+
 # Include the Rack plugin Makefile framework
 include $(RACK_DIR)/plugin.mk
+

@@ -1,4 +1,5 @@
 #include "../../sdk/Rack-SDK/dep/include/nanovg.h"
+#include "pitch.hpp"
 #include "plugin.hpp"
 #include "rack.hpp"
 #include <fstream>
@@ -9,63 +10,8 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-
 // Use nlohmann/json for JSON parsing
 using json = nlohmann::json;
-
-template <uint MOD> class ZZ_Mod {
-private:
-  uint value;
-
-  uint mod(int input) const {
-    int result = input % MOD;
-    return result >= 0 ? result : result + MOD;
-  }
-
-public:
-  ZZ_Mod() : value(0) {}
-  explicit ZZ_Mod(uint v) : value(mod(v)) {}
-
-  uint unMod() const { return value; }
-
-  ZZ_Mod operator+(const ZZ_Mod &other) const {
-    return ZZ_Mod(mod(value + other.value));
-  }
-  ZZ_Mod operator-(const ZZ_Mod &other) const {
-    return ZZ_Mod(mod(value - other.value));
-  }
-  ZZ_Mod operator*(const ZZ_Mod &other) const {
-    return ZZ_Mod(mod(value * other.value));
-  }
-  bool operator==(const ZZ_Mod &other) const { return value == other.value; }
-  bool operator<(const ZZ_Mod &other) const { return value < other.value; }
-  std::string to_string() const {
-    return "{" + std::to_string(value) + " % " + std::to_string(MOD) + "}";
-  }
-};
-
-using ZZ_7 = ZZ_Mod<7>;
-using ZZ_12 = ZZ_Mod<12>;
-
-// struct Vertex
-// {
-// 	int x, y, z, w;
-// 	bool operator<(const Vertex &other) const
-// 	{
-// 		if (x != other.x)
-// 			return x < other.x;
-// 		if (y != other.y)
-// 			return y < other.y;
-// 		if (z != other.z)
-// 			return z < other.z;
-// 		return w < other.w;
-// 	}
-// 	bool operator==(const Vertex &other) const
-// 	{
-// 		return x == other.x && y == other.y && z == other.z && w ==
-// other.w;
-// 	}
-// };
 
 template <typename T> struct Vertex_ {
   T x, y, z, w;
@@ -105,6 +51,17 @@ template <typename T> struct Vertex_ {
 using Vertex = Vertex_<int>;
 using VertexZZ_7 = Vertex_<ZZ_7>;
 using VertexZZ_12 = Vertex_<ZZ_12>;
+
+// Function to compute the pitch:  compute the index in the underlaying scale
+// (eg, 3rd) to get the number of semitones for that interval; then multiply by
+// the position in that coordinate
+int computePitch(const HeptatonicScale &scale, const VertexZZ_7 &intervals,
+                 const Vertex &coord) {
+  return (scale[intervals.x.unMod()].unMod() * coord.x) +
+         (scale[intervals.y.unMod()].unMod() * coord.y) +
+         (scale[intervals.z.unMod()].unMod() * coord.z) +
+         (scale[intervals.w.unMod()].unMod() * coord.w);
+}
 
 std::string toStringVertex(const Vertex &v) {
   return "(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " +
@@ -162,133 +119,6 @@ struct VectorHash {
 // 		return notes[index];
 // 	}
 // };
-
-// Define the HeptatonicScale struct using ZZ_12
-struct HeptatonicScale {
-  std::vector<ZZ_12> notes;
-
-  HeptatonicScale(std::initializer_list<ZZ_12> init) : notes(init) {}
-
-  HeptatonicScale succMode() const {
-    HeptatonicScale result = *this;
-    ZZ_12 first = result.notes[0];
-    for (size_t i = 0; i < result.notes.size() - 1; ++i) {
-      result.notes[i] = result.notes[i + 1];
-    }
-    result.notes[result.notes.size() - 1] = first;
-    return result;
-  }
-
-  ZZ_12 operator[](int index) const {
-    if (index < 0 || index >= static_cast<int>(notes.size()))
-      throw std::out_of_range("Index out of range");
-    return notes[index];
-  }
-};
-
-std::string toStringHeptatonicScale(const HeptatonicScale &scale) {
-  std::string result = "{";
-  for (size_t i = 0; i < scale.notes.size(); ++i) {
-    result += scale.notes[i].to_string();
-    if (i < scale.notes.size() - 1) {
-      result += ", ";
-    }
-  }
-  result += "}";
-  return result;
-}
-
-// Define the scales as global constants
-// Define constants for each mode
-const HeptatonicScale cIonian = {ZZ_12(0), ZZ_12(2), ZZ_12(4), ZZ_12(5),
-                                 ZZ_12(7), ZZ_12(9), ZZ_12(11)};
-const HeptatonicScale cDorian = cIonian.succMode();
-const HeptatonicScale cPhrygian = cDorian.succMode();
-const HeptatonicScale cLydian = cPhrygian.succMode();
-const HeptatonicScale cMixolydian = cLydian.succMode();
-const HeptatonicScale cAeolian = cMixolydian.succMode();
-const HeptatonicScale cLocrian = cAeolian.succMode();
-
-// Function to get scale by mode using switch case
-HeptatonicScale getScaleByMode(ZZ_7 mode) {
-  switch (mode.unMod()) {
-  case 0:
-    return cIonian;
-  case 1:
-    return cDorian;
-  case 2:
-    return cPhrygian;
-  case 3:
-    return cLydian;
-  case 4:
-    return cMixolydian;
-  case 5:
-    return cAeolian;
-  case 6:
-    return cLocrian;
-  default:
-    throw std::out_of_range("Invalid mode");
-  }
-}
-
-// Function to compute the pitch:  compute the index in the underlaying scale
-// (eg, 3rd) to get the number of semitones for that interval; then multiply by
-// the position in that coordinate
-int computePitch(const HeptatonicScale &scale, const VertexZZ_7 &intervals,
-                 const Vertex &coord) {
-  return (scale[intervals.x.unMod()].unMod() * coord.x) +
-         (scale[intervals.y.unMod()].unMod() * coord.y) +
-         (scale[intervals.z.unMod()].unMod() * coord.z) +
-         (scale[intervals.w.unMod()].unMod() * coord.w);
-}
-
-// Enum representing the 12-tone chromatic scale
-enum class Chromatic { C, Cs, D, Eb, E, F, Fs, G, Gs, A, Bb, B };
-
-// Function to convert Chromatic to string
-std::string toString(Chromatic note) {
-  switch (note) {
-  case Chromatic::C:
-    return "C";
-  case Chromatic::Cs:
-    return "C#";
-  case Chromatic::D:
-    return "D";
-  case Chromatic::Eb:
-    return "Eb";
-  case Chromatic::E:
-    return "E";
-  case Chromatic::F:
-    return "F";
-  case Chromatic::Fs:
-    return "F#";
-  case Chromatic::G:
-    return "G";
-  case Chromatic::Gs:
-    return "G#";
-  case Chromatic::A:
-    return "A";
-  case Chromatic::Bb:
-    return "Bb";
-  case Chromatic::B:
-    return "B";
-  default:
-    throw std::out_of_range("Invalid Chromatic note");
-  }
-}
-
-// Function to convert uint to Chromatic (assuming 0 corresponds to C)
-Chromatic toChromatic(ZZ_12 num) {
-  uint n = num.unMod();
-  if (n >= 12) {
-    throw std::out_of_range(
-        "Number must be in the range 0-11 for Chromatic conversion");
-  }
-  return static_cast<Chromatic>(n);
-}
-
-// Function to convert Chromatic to ZZ_12
-ZZ_12 toZZ_12(Chromatic note) { return ZZ_12(static_cast<uint>(note)); }
 
 void centerRuledLabel(NVGcontext *vg, float x0, float y0, float w,
                       const char *label, int size = 14) {
@@ -709,8 +539,8 @@ struct AmB_TonnetzWidget : ModuleWidget {
                                                AmB_Tonnetz::OUTPUT_OUTPUT));
 
     // mm2px(Vec(460.335, 349.721))
-    tileUIWidget = createWidget<TileUIWidget>(mm2px(Vec(6.257, 6.71)));
-    tileUIWidget->setSize(mm2px(Vec(162.396, 123.374)));
+    tileUIWidget = createWidget<TileUIWidget>(mm2px(Vec(1, 1)));
+    tileUIWidget->setSize(mm2px(Vec(163, 125)));
     addChild(tileUIWidget);
     if (module) {
       module->setTileUIWidget(tileUIWidget);

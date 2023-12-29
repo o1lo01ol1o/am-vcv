@@ -14,4 +14,7 @@ devenv.local.nix
 /**/*.so
 /**/*.dylib
 /**/*.dll
+/**/test.*
+test
+test.d
 .DS_Store
