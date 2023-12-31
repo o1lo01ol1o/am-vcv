@@ -24,7 +24,7 @@ DISTRIBUTABLES += $(wildcard presets)
 # Test-related configurations
 TEST_SOURCES := $(wildcard src/tps.cpp)  # Adjust with your test file location
 TEST_FLAGS := -DTEST -Isrc  # Define TEST, and include the src directory if needed
-TEST_BINARY := test  # Name of the test binary
+TEST_BINARY := testBin  # Name of the test binary
 
 
 # Test suite target
@@ -35,8 +35,8 @@ test: $(TEST_SOURCES)
 	$(CXX) $(FLAGS) $(CXXFLAGS) -o $(TEST_BINARY) $(TEST_SOURCES)
 	otool -L $(TEST_BINARY)
 	ls -l $(TEST_BINARY) # List the file to confirm it's created
-	export DYLD_LIBRARY_PATH=/Users/timpierson/arity/am-vcv/sdk/Rack-SDK:$DYLD_LIBRARY_PATH
-	./$(TEST_BINARY) && (rm -f $(TEST_BINARY) test.d)
+	export DYLD_LIBRARY_PATH=/Users/timpierson/arity/am-vcv/sdk/Rack-SDK:$(DYLD_LIBRARY_PATH)
+	./$(TEST_BINARY)
 
 # Include the Rack plugin Makefile framework
 include $(RACK_DIR)/plugin.mk

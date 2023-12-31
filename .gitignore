@@ -15,6 +15,6 @@ devenv.local.nix
 /**/*.dylib
 /**/*.dll
 /**/test.*
-test
-test.d
+testBin
+testBin.d
 .DS_Store

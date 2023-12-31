@@ -17,14 +17,16 @@
     RACK_DIR = (builtins.getEnv "PWD") + "/sdk/Rack-SDK";
     DATA_DIR = (builtins.getEnv "PWD") + "/data";
     DEVENV_FLAGS =
-      "-I ${pkgs.nlohmann_json}/include $(cat ${pkgs.stdenv.cc}/nix-support/cc-cflags) $(cat ${pkgs.stdenv.cc}/nix-support/libcxx-cxxflags) $(cat ${pkgs.stdenv.cc}/nix-support/libc-cflags)";
+      " -I ${pkgs.nlohmann_json}/include $(cat ${pkgs.stdenv.cc}/nix-support/cc-cflags) $(cat ${pkgs.stdenv.cc}/nix-support/libcxx-cxxflags) $(cat ${pkgs.stdenv.cc}/nix-support/libc-cflags)";
   };
   # https://devenv.sh/packages/
   packages = [
     pkgs.nixfmt
+    pkgs.libsndfile
     pkgs.makeWrapper
     pkgs.pkg-config
-    pkgs.libclang
+    pkgs.which
+    pkgs.glew
     pkgs.jq
     pkgs.nlohmann_json
   ];
@@ -32,16 +34,10 @@
   # https://devenv.sh/scripts/
   scripts.hello.exec = "echo hello from $GREET";
 
-  scripts.test.exec =
-    " g++ -o AmmannBeeknerTileUITest AmB-Tonnetz/src/am.cpp -I ${pkgs.nlohmann_json} -lstdc++fs -lm";
+  scripts.test.exec = "make clean && make test";
 
   enterShell = ''
     hello
-    echo ${pkgs.nlohmann_json}
-    echo ${pkgs.libclang}
-    cat ${pkgs.stdenv.cc}/nix-support/cc-cflags
-    cat ${pkgs.stdenv.cc}/nix-support/libc-cflags
-    cat ${pkgs.stdenv.cc}/nix-support/libcxx-cxxflags
     git --version
   '';
 

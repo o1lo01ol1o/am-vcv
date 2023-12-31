@@ -97,6 +97,3 @@ Chromatic toChromatic(ZZ_12 num) {
   }
   return static_cast<Chromatic>(n);
 }
-
-// Function to convert Chromatic to ZZ_12
-ZZ_12 toZZ_12(Chromatic note) { return ZZ_12(static_cast<uint>(note)); }

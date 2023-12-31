@@ -1,0 +1,24 @@
+{
+  "slug": "tambura",
+  "name": "tambura",
+  "version": "2.0.0",
+  "license": "MIT",
+  "brand": "Faust",
+  "author": "GRAME",
+  "authorEmail": "research@grame.fr",
+  "authorUrl": "https://faust.grame.fr",
+  "pluginUrl": "",
+  "manualUrl": "",
+  "sourceUrl": "https://github.com/grame-cncm/faust",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": [
+    {
+      "slug": "tambura",
+      "name": "tambura",
+      "description": "",
+      "tags": [
+      ]
+    }
+  ]
+}

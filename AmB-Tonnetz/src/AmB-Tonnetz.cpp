@@ -450,12 +450,20 @@ struct AmB_Tonnetz : Module {
 
   enum ParamId { PARAMS_LEN };
   enum InputId { INPUTS_LEN };
-  enum OutputId { OUTPUT_OUTPUT, OUTPUT_GATE, OUTPUTS_LEN };
+  enum OutputId {
+    OUTPUT_OUTPUT,
+    OUTPUT_GATE,
+    OUTPUT_DRAG_X,
+    OUTPUT_DRAG_Y,
+    OUTPUTS_LEN
+  };
   enum LightId { LIGHTS_LEN };
 
   AmB_Tonnetz() {
     config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
     configOutput(OUTPUT_GATE, "GATE");
+    configOutput(OUTPUT_DRAG_X, "Mouse X");
+    configOutput(OUTPUT_DRAG_Y, "Mouse Y");
     configOutput(OUTPUT_OUTPUT, "CV");
     maxChannels = 4; // Max polyphony, adjust as needed
   }
@@ -511,6 +519,8 @@ struct AmB_Tonnetz : Module {
           outputs[OUTPUT_GATE].setVoltage(0, i);
         }
       }
+      outputs[OUTPUT_DRAG_X].setVoltage(tileUIWidget->dragState.delta.x);
+      outputs[OUTPUT_DRAG_Y].setVoltage(tileUIWidget->dragState.delta.y);
     }
   }
 };
@@ -532,7 +542,10 @@ struct AmB_TonnetzWidget : ModuleWidget {
         Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
     addChild(createWidget<ScrewSilver>(Vec(
         box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-
+    addOutput(createOutputCentered<PJ301MPort>(Vec(694.804, 235.201), module,
+                                               AmB_Tonnetz::OUTPUT_DRAG_X));
+    addOutput(createOutputCentered<PJ301MPort>(Vec(544.804, 235.201), module,
+                                               AmB_Tonnetz::OUTPUT_DRAG_Y));
     addOutput(createOutputCentered<PJ301MPort>(Vec(694.804, 335.201), module,
                                                AmB_Tonnetz::OUTPUT_GATE));
     addOutput(createOutputCentered<PJ301MPort>(Vec(544.804, 335.201), module,

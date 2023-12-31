@@ -67,4 +67,5 @@ HeptatonicScale getScaleByMode(ZZ_7 mode);
 enum class Chromatic { C, Cs, D, Eb, E, F, Fs, G, Gs, A, Bb, B };
 std::string toString(Chromatic note);
 Chromatic toChromatic(ZZ_12 num);
-ZZ_12 toZZ_12(Chromatic note);
+// Function to convert Chromatic to ZZ_12
+ZZ_12 toZZ_12(Chromatic note) { return ZZ_12(static_cast<uint>(note)); }
