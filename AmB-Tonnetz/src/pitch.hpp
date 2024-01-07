@@ -19,6 +19,16 @@ public:
   explicit ZZ_Mod(uint v) : value(mod(v)) {}
 
   uint unMod() const { return value; }
+  static int getInterval(ZZ_Mod a, ZZ_Mod b) {
+    uint larger = std::max(a.value, b.value);
+    uint smaller = std::min(a.value, b.value);
+    uint interval = larger - smaller;
+
+    if (interval > MOD / 2) {
+      interval = MOD - interval;
+    }
+    return static_cast<int>(interval);
+  }
 
   ZZ_Mod operator+(const ZZ_Mod &other) const {
     return ZZ_Mod(mod(value + other.value));
@@ -65,7 +75,7 @@ std::string toStringHeptatonicScale(const HeptatonicScale &scale);
 HeptatonicScale getScaleByMode(ZZ_7 mode);
 // Enum representing the 12-tone chromatic scale
 enum class Chromatic { C, Cs, D, Eb, E, F, Fs, G, Gs, A, Bb, B };
-std::string toString(Chromatic note);
-Chromatic toChromatic(ZZ_12 num);
-// Function to convert Chromatic to ZZ_12
-ZZ_12 toZZ_12(Chromatic note) { return ZZ_12(static_cast<uint>(note)); }
+extern std::string toString(Chromatic note);
+
+extern Chromatic toChromatic(ZZ_12 num);
+extern ZZ_12 toZZ_12(Chromatic note);

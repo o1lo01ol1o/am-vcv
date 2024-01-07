@@ -22,7 +22,8 @@ DISTRIBUTABLES += $(wildcard presets)
 
 
 # Test-related configurations
-TEST_SOURCES := $(wildcard src/tps.cpp)  # Adjust with your test file location
+TEST_SOURCES := $(wildcard src/chord.cpp)  # Adjust with your test file location
+# TEST_SOURCES :+ $(wildcard src/tps.cpp)  # Adjust with your test file location
 TEST_FLAGS := -DTEST -Isrc  # Define TEST, and include the src directory if needed
 TEST_BINARY := testBin  # Name of the test binary
 

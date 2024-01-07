@@ -1,4 +1,5 @@
 #include "../../sdk/Rack-SDK/dep/include/nanovg.h"
+#include "chord.hpp"
 #include "pitch.hpp"
 #include "plugin.hpp"
 #include "rack.hpp"
@@ -121,12 +122,12 @@ struct VectorHash {
 // };
 
 void centerRuledLabel(NVGcontext *vg, float x0, float y0, float w,
-                      const char *label, int size = 14) {
+                      const char *label, int size = 14, float fill = 0.5) {
   nvgBeginPath(vg);
   // nvgFontFaceId(vg, fontId(vg));
   nvgFontSize(vg, size);
   nvgTextAlign(vg, NVG_ALIGN_MIDDLE | NVG_ALIGN_CENTER);
-  nvgFillColor(vg, nvgRGBf(0.5, 0.5, 0.5));
+  nvgFillColor(vg, nvgRGBf(fill, fill, fill));
   nvgText(vg, x0 + w / 2, y0, label, NULL);
 
   float bounds[4];
@@ -397,7 +398,7 @@ struct TileUIWidget : OpaqueWidget {
         if (labelMap.find(vertex) == labelMap.end()) {
 
           int pitch = computePitch(scale, intervals, vertex);
-          int octave = 4 + pitch / 12;
+          int octave = 3 + (pitch / 12);
           Chromatic chromatic = toChromatic(ZZ_12(pitch));
           std::string label = toString(chromatic);
           std::string octaveStr = std::to_string(octave);
@@ -489,16 +490,18 @@ struct AmB_Tonnetz : Module {
   }
 
   void process(const ProcessArgs &args) override {
+    const float epsilon = 1e-6;
 
     if (tileUIWidget) {
       std::vector<int> midiNotes = generateMidiNote(); // Vector of MIDI notes
       size_t notes_on = midiNotes.size();
-      outputs[OUTPUT_OUTPUT].setChannels(maxChannels);
-      outputs[OUTPUT_GATE].setChannels(maxChannels);
+      outputs[OUTPUT_OUTPUT].setChannels(notes_on);
+      outputs[OUTPUT_GATE].setChannels(notes_on);
       for (size_t i = 0; i < notes_on; ++i) {
         float cv = (midiNotes[i]) / 12.0f;
         float ccv = outputs[OUTPUT_OUTPUT].getVoltage(i);
-        if (cv != ccv) {
+
+        if (std::abs(cv - ccv) > epsilon) {
           outputs[OUTPUT_OUTPUT].setVoltage(cv, i); // Set CV for each channel}
         }
       }
@@ -510,8 +513,8 @@ struct AmB_Tonnetz : Module {
       if (notes_on > 0) {
         for (size_t i = 0; i < notes_on && i < maxChannels; ++i) {
           float gv = outputs[OUTPUT_GATE].getVoltage(i);
-          if (gv != 5) {
-            outputs[OUTPUT_GATE].setVoltage(5, i);
+          if (std::abs(gv - 10) > epsilon) {
+            outputs[OUTPUT_GATE].setVoltage(10, i);
           }
         }
       } else {
@@ -525,8 +528,63 @@ struct AmB_Tonnetz : Module {
   }
 };
 
+struct ChordNameUIWidget : OpaqueWidget {
+  TileUIWidget *tileUIWidget;
+  void setTileUIWidget(TileUIWidget *newTileUIWidget) {
+    tileUIWidget = newTileUIWidget;
+  }
+  std::vector<int> generateMidiNote() {
+    HeptatonicScale scale = getScaleByMode(tileUIWidget->mode);
+    std::vector<int> midiNotes;
+    if (tileUIWidget && !tileUIWidget->tileUI.coordinatesOn.empty()) {
+      for (auto &coord : tileUIWidget->tileUI.coordinatesOn) {
+        midiNotes.push_back(
+            computePitch(scale, tileUIWidget->intervals, coord));
+      }
+    };
+    if (tileUIWidget && tileUIWidget->tileUI.coordinatesOn.empty()) {
+      midiNotes.clear();
+    }
+    return midiNotes;
+  }
+  void draw(const DrawArgs &args) override {
+    std::vector<int> midiNotes = generateMidiNote(); // Vector of MIDI notes
+    if (!midiNotes.empty()) {
+      int root = *std::min_element(midiNotes.begin(), midiNotes.end());
+      midiNotes.erase(std::remove(midiNotes.begin(), midiNotes.end(), root),
+                      midiNotes.end());
+      Chromatic root_prime = toChromatic(ZZ_12(root));
+      std::vector<Chromatic> chromaticNotes;
+      for (int note : midiNotes) {
+        chromaticNotes.push_back(toChromatic(ZZ_12(note)));
+      }
+      try {
+        std::vector<std::string> chordNames;
+        chordNames = getChordNames(
+            root_prime,
+            std::set<Chromatic>(chromaticNotes.begin(), chromaticNotes.end()));
+        std::string chordName = "Unnamed";
+        if (!chordNames.empty()) {
+          auto shortest =
+              std::min_element(chordNames.begin(), chordNames.end(),
+                               [](const std::string &a, const std::string &b) {
+                                 return a.size() < b.size();
+                               });
+          chordName = toString(root_prime) + " " + *shortest;
+        }
+
+        centerRuledLabel(args.vg, 0, 0, 12, chordName.c_str(), 24);
+      } catch (const std::exception &e) {
+        std::string errorMessage = e.what();
+        centerRuledLabel(args.vg, 0, 0, 12, errorMessage.c_str(), 12);
+      }
+    }
+  }
+};
+
 struct AmB_TonnetzWidget : ModuleWidget {
   TileUIWidget *tileUIWidget;
+  ChordNameUIWidget *chordNameWidget;
   AmB_TonnetzWidget(AmB_Tonnetz *module)
 
   {
@@ -558,6 +616,11 @@ struct AmB_TonnetzWidget : ModuleWidget {
     if (module) {
       module->setTileUIWidget(tileUIWidget);
     }
+    chordNameWidget = createWidget<ChordNameUIWidget>(Vec(600, 100));
+
+    chordNameWidget->setSize(mm2px(Vec(45, 40)));
+    addChild(chordNameWidget);
+    chordNameWidget->setTileUIWidget(tileUIWidget);
   }
   void appendContextMenu(Menu *menu) override {
 

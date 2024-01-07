@@ -11,43 +11,39 @@
 #include <string>
 #include <vector>
 
-// Assuming Chromatic and ZZ_12 are already defined
+class ChordTablesException : public std::exception {
+private:
+  std::string message;
 
-// Helper function to convert Chromatic enum to corresponding pitch class number
-int chromaticToPitchClass(Chromatic note) { return static_cast<int>(note); }
+public:
+  ChordTablesException(const std::string &msg) : message(msg) {}
 
-std::vector<ZZ_12> constructIntervalRep(const std::vector<Chromatic> &chord) {
-  std::vector<ZZ_12> intervals;
-  for (size_t i = 1; i < chord.size(); ++i) {
-    int interval =
-        chromaticToPitchClass(chord[i]) - chromaticToPitchClass(chord[i - 1]);
-    intervals.push_back(ZZ_12(interval));
-  }
-  return intervals;
-}
-
-const std::map<std::vector<int>, std::vector<std::string>> tnIndexToChordInfo =
-    {
-        {{0, 1, 2}, {"ChordName1"}}, {{0, 1, 4}, {"ChordName2"}},
-        // ... continue for other chords
+  virtual const char *what() const throw() { return message.c_str(); }
 };
 
-std::vector<std::string> getChordName(const std::vector<Chromatic> &chord) {
-  auto intervals = constructIntervalRep(chord);
+// Defining a structure for Chord Representation
+struct ChordRep {
+  std::vector<int> intervalTuple;  // Pitch class intervals
+  std::vector<int> intervalCount;  // Canonical 6-tuple for intervals
+  std::vector<int> additionalInfo; // Additional chord information
+  int extraData;                   // Additional data (if needed)
+  int &operator[](size_t idx);     // Declaration of the operator[]
+};
 
-  // Convert ZZ_12 intervals to int and normalize to start from 0
-  std::vector<int> intervalVector;
-  int root = intervals.front().unMod();
-  for (const auto &interval : intervals) {
-    intervalVector.push_back((interval.unMod() - root + 12) % 12);
-  }
-  std::sort(intervalVector.begin(),
-            intervalVector.end()); // Ensure ordered for map lookup
+struct TNIStructure {
+  std::vector<int> pitchClasses;
+  std::tuple<int, int, int, int, int, int> icv;
+  std::tuple<int, int, int, int, int, int, int, int> invarianceVector;
+  int zRelation;
 
-  // Look up in tnIndexToChordInfo
-  auto it = tnIndexToChordInfo.find(intervalVector);
-  if (it != tnIndexToChordInfo.end()) {
-    return it->second; // Chord name found
-  }
-  return {"Unknown Chord"}; // No matching chord found
-}
+  TNIStructure(
+      std::vector<int> _pitchClasses,
+      std::tuple<int, int, int, int, int, int> _icv,
+      std::tuple<int, int, int, int, int, int, int, int> _invarianceVector,
+      int _zRelation)
+      : pitchClasses(_pitchClasses), icv(_icv),
+        invarianceVector(_invarianceVector), zRelation(_zRelation) {}
+};
+
+extern std::vector<std::string> getChordNames(const Chromatic &root,
+                                              const std::set<Chromatic> &chord);
