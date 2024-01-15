@@ -3,6 +3,8 @@
 #include "pitch.hpp"
 #include "plugin.hpp"
 #include "rack.hpp"
+#include <Eigen/FFT>
+#include <Eigen>
 #include <complex>
 #include <fstream>
 #include <functional>
@@ -124,12 +126,6 @@ const FixedVectorTwelveChromatic chromaticVector() {
        Chromatic::Bb, Chromatic::B}};
 }
 
-std::complex<float> toComplex(int value) {
-  // Implement the conversion from an integer to a complex number.
-  // This is a placeholder implementation.
-  return std::complex<float>(static_cast<float>(value), 0.0f);
-}
-
 FixedVectorTwelveComplex cs(const std::vector<ZZ_12> &mods) {
   FixedVectorTwelveComplex result(std::complex<float>(0.0f, 0.0f));
 
@@ -143,96 +139,97 @@ FixedVectorTwelveComplex cs(const std::vector<ZZ_12> &mods) {
 
   return result;
 }
-
-FixedVectorSixComplex toTk(const FixedVectorTwelveUint &c) {
-  FixedVectorSixComplex result{};
-  for (size_t i = 0; i < 6; ++i) {
-    // Assuming the conversion to 'Mod' and then to complex number
-    // For simplicity, directly converting the integer to a complex number
-    result.values[i] = toComplex(c.values[i]);
-  }
-  return result;
-}
-
 FixedVector<std::complex<float>, 12>
-dft(const FixedVector<std::complex<float>, 12> &input) {
-  // PFFFT only supports sizes that are powers of 2.
-  // If 12 is a fixed requirement, you'll need to pad the input to the nearest
-  // power of 2.
-  const size_t N = 16; // Next power of 2 after 12
-
-  // Allocate aligned memory
-  float *in_aligned = (float *)pffft_aligned_malloc(sizeof(float) * 2 * N);
-  float *out_aligned = (float *)pffft_aligned_malloc(sizeof(float) * 2 * N);
-
-  // Copy input data to aligned buffer, interleaving real and imaginary parts
-  for (size_t i = 0; i < 12; ++i) {
-    in_aligned[2 * i] = input.values[i].real();
-    in_aligned[2 * i + 1] = input.values[i].imag();
+naiveDft(const FixedVector<std::complex<float>, 12> &input) {
+  Eigen::VectorXcf eigenInput(12);
+  for (int i = 0; i < 12; ++i) {
+    eigenInput(i) = input.values[i];
   }
-  // Pad the rest with zeros
-  std::fill(in_aligned + 24, in_aligned + 2 * N, 0.0f);
 
-  // Create plan
-  PFFFT_Setup *setup = pffft_new_setup(N, PFFFT_COMPLEX);
-  pffft_transform_ordered(setup, in_aligned, out_aligned, NULL, PFFFT_FORWARD);
+  Eigen::FFT<float> fft;
+  Eigen::VectorXcf eigenOutput(12);
+  fft.fwd(eigenOutput, eigenInput);
 
-  // Copy back to output
+  // Eigen::VectorXcf eigenOutput = eigenInput.fft();
+
   FixedVector<std::complex<float>, 12> output;
-  for (size_t i = 0; i < 12; ++i) {
-    output.values[i] =
-        std::complex<float>(out_aligned[2 * i], out_aligned[2 * i + 1]);
+  for (int i = 0; i < 12; ++i) {
+    output.values[i] = eigenOutput(i);
   }
-
-  // Cleanup
-  pffft_aligned_free(in_aligned);
-  pffft_aligned_free(out_aligned);
-  pffft_destroy_setup(setup);
 
   return output;
 }
 
-FixedVector<std::complex<float>, 12>
-idft(const FixedVector<std::complex<float>, 12> &input) {
-  const size_t N = 16; // Pad to the next power of 2
+// FixedVector<std::complex<float>, 12> naiveDft(const
+// FixedVector<std::complex<float>, 12> &input)
+// {
+//   // PFFFT only supports sizes that are powers of 2, so we pad our array to
+//   16 std::array<std::complex<float>, 16> paddedInput;
+//   std::copy(input.values.begin(), input.values.end(), paddedInput.begin());
+//   std::fill(paddedInput.begin() + 12, paddedInput.end(),
+//   std::complex<float>(0.0f, 0.0f));
 
-  // Allocate aligned memory for the input and output
-  float *in_aligned = (float *)pffft_aligned_malloc(sizeof(float) * 2 * N);
-  float *out_aligned = (float *)pffft_aligned_malloc(sizeof(float) * 2 * N);
+//   // Initialize PFFFT setup for a 1D complex transform of size 16
+//   PFFFT_Setup *setup = pffft_new_setup(16, PFFFT_COMPLEX);
+//   if (!setup)
+//   {
+//     throw std::runtime_error("Failed to initialize PFFFT setup");
+//   }
 
-  // Copy input data to the aligned buffer, interleaving real and imaginary
-  // parts
-  for (size_t i = 0; i < 12; ++i) {
-    in_aligned[2 * i] = input.values[i].real();
-    in_aligned[2 * i + 1] = input.values[i].imag();
-  }
-  // Pad the rest of the array with zeros
-  std::fill(in_aligned + 24, in_aligned + 2 * N, 0.0f);
+//   // Allocate aligned memory for the transform
+//   float *paddedInputData = (float *)pffft_aligned_malloc(16 * 2 *
+//   sizeof(float)); float *transformedData = (float *)pffft_aligned_malloc(16 *
+//   2 * sizeof(float));
 
-  // Create the PFFFT setup
-  PFFFT_Setup *setup = pffft_new_setup(N, PFFFT_COMPLEX);
+//   // Copy our complex input data into the real and imaginary parts of the
+//   aligned input array for (size_t i = 0; i < paddedInput.size(); ++i)
+//   {
+//     paddedInputData[2 * i] = paddedInput[i].real();
+//     paddedInputData[2 * i + 1] = paddedInput[i].imag();
+//   }
 
-  // Perform the IDFT
-  pffft_transform_ordered(setup, in_aligned, out_aligned, NULL, PFFFT_BACKWARD);
+//   // Perform the forward Fourier transform
+//   pffft_transform_ordered(setup, paddedInputData, transformedData, nullptr,
+//   PFFFT_FORWARD);
 
-  // Copy the output from the aligned buffer back to the FixedVector,
-  // normalizing it
-  FixedVector<std::complex<float>, 12> output;
-  for (size_t i = 0; i < 12; ++i) {
-    output.values[i] =
-        std::complex<float>(out_aligned[2 * i] / N, out_aligned[2 * i + 1] / N);
-  }
+//   // Copy the transformed data back into a FixedVector
+//   FixedVector<std::complex<float>, 12> output;
+//   for (size_t i = 0; i < 12; ++i)
+//   {
+//     output.values[i] = std::complex<float>(transformedData[2 * i],
+//     transformedData[2 * i + 1]);
+//   }
 
-  // Free the allocated memory and destroy the PFFFT setup
-  pffft_aligned_free(in_aligned);
-  pffft_aligned_free(out_aligned);
-  pffft_destroy_setup(setup);
+//   // Free the allocated memory and destroy the PFFFT setup
+//   pffft_aligned_free(paddedInputData);
+//   pffft_aligned_free(transformedData);
+//   pffft_destroy_setup(setup);
 
-  return output;
-}
+//   return output;
+// }
+
+// FixedVector<std::complex<float>, 12>
+// naiveDft(const FixedVector<std::complex<float>, 12> &input)
+// {
+//   FixedVector<std::complex<float>, 12> output;
+//   const size_t N = 12;
+//   for (size_t k = 0; k < N; ++k)
+//   {
+//     std::complex<float> sum(0.0f, 0.0f);
+//     for (size_t n = 0; n < N; ++n)
+//     {
+//       float angle = 2 * M_PI * k * n / N;
+//       std::complex<float> w(std::cos(angle), -std::sin(angle));
+//       sum += input.values[n] * w;
+//     }
+//     output.values[k] = sum;
+//   }
+//   return output;
+// }
 
 // Define the list 'ws' as a constant array
 const std::array<int, 6> ws = {2, 11, 17, 16, 19, 7};
+// const std::array<float, 6> ws = {3, 8, 11.5, 15, 14.5, 7.5};
 
 // Function 'w' to access elements from the 'ws' array
 int w(int k) {
@@ -242,28 +239,50 @@ int w(int k) {
   throw std::out_of_range("Index out of range"); // or handle as you see fit
 }
 
-FixedVectorSixComplex tk6_prime(const FixedVectorTwelveComplex &cs_prime) {
-  // Perform DFT on the input
-  auto dft_result = dft(cs_prime);
-
-  // Calculate the sum of the input elements (cbar)
-  std::complex<float> cbar =
+FixedVector<std::complex<float>, 12>
+cbar(const FixedVectorTwelveComplex &cs_prime) {
+  std::complex<float> sum =
       std::accumulate(cs_prime.values.begin(), cs_prime.values.end(),
                       std::complex<float>(0, 0));
+  FixedVector<std::complex<float>, 12> normalized_cs_prime;
+  if (sum != std::complex<float>(0, 0)) // Avoid division by zero
+  {
+    for (size_t i = 0; i < cs_prime.values.size(); ++i) {
+      normalized_cs_prime.values[i] = cs_prime.values[i] / sum;
+    }
+  }
+  return normalized_cs_prime;
+}
 
-  // Calculate the weights (wks)
-  FixedVectorSixComplex wks;
-  for (size_t i = 0; i < 6; ++i) {
-    wks.values[i] = std::complex<float>(w(i), 0) / cbar;
+FixedVectorSixComplex tk6_prime(const FixedVectorTwelveComplex &cs_prime) {
+
+  // Perform DFT on the input
+  auto dft_result = naiveDft(cbar(cs_prime));
+  if (dft_result.values[0] !=
+      std::complex<float>(0, 0)) // Check if the first element is not zero
+  {
+    for (auto &val : dft_result.values) {
+      val /= dft_result.values[0]; // Divide each element by the first element
+    }
   }
 
   // Apply the weights and keep only the first 6 elements
   FixedVectorSixComplex result;
-  for (size_t i = 0; i < 6; ++i) {
-    result.values[i] = wks.values[i] * dft_result.values[i];
+  for (size_t i = 1; i < 7; ++i) {
+    result.values[i - 1] =
+        (std::complex<float>(w(i - 1), 0)) * dft_result.values[i];
   }
 
   return result;
+}
+
+// Function to take the norm of a complex vector
+float complexVectorNorm(const std::vector<std::complex<float>> &vec) {
+  float norm = 0.0f;
+  for (const auto &val : vec) {
+    norm += std::norm(val);
+  }
+  return std::sqrt(norm);
 }
 
 FixedVectorSixComplex tk6(const std::vector<ZZ_12> &ns) {
@@ -272,52 +291,21 @@ FixedVectorSixComplex tk6(const std::vector<ZZ_12> &ns) {
   return tk6_prime(cs_prime);
 }
 
-float norm(const std::vector<float> &v) {
-  float sum = 0.0f;
-  for (auto &value : v) {
-    sum += value * value;
-  }
-  return std::sqrt(sum);
-}
-
-std::complex<float> complexNorm(const std::vector<std::complex<float>> &v) {
-  std::complex<float> sum = 0.0f;
-  for (const auto &c : v) {
-    sum +=
-        (c *
-         c); // std::norm computes the squared magnitude of the complex number
-  }
-  return sqrt(sum);
-}
-
-float maxClassConsonance() {
-  float maxConsonance = 0.0f;
-  FixedVectorTwelveChromatic chromatic = chromaticVector();
-
-  for (size_t i = 0; i < chromatic.values.size(); ++i) {
-    // Apply toLocalInterpretation and tk6
-    // This is a placeholder. Replace with actual implementation.
-    auto toRealPart = [](const std::complex<float> &c) { return c.real(); };
-    std::vector<ZZ_12> v = {toZZ_12(chromatic.values[i])};
-    std::vector<std::complex<float>> tk6Result = tk6(v).to_vector();
-
-    float currentNorm = toRealPart(complexNorm(tk6Result));
-    maxConsonance = std::max(maxConsonance, currentNorm);
-  }
-
-  return maxConsonance;
-}
-
 float consonance(const std::vector<ZZ_12> &xs) {
   // Apply tk6 to the pitch classes.
-  // Replace this with your actual implementation of tk6.
-  auto toRealPart = [](const std::complex<float> &c) { return c.real(); };
   std::vector<std::complex<float>> tk6Result = (tk6(xs)).to_vector();
 
   // Calculate the norm of the tk6Result.
-  float normValue = toRealPart(complexNorm(tk6Result));
+
+  float normValue = complexVectorNorm(tk6Result);
 
   // Divide by the constant value.
+  // const float constant = 32.86335345030997f;
+  return normValue; // / constant;
+}
+
+float normalizedConsonance(const std::vector<ZZ_12> &xs) {
+  float normValue = consonance(xs);
   const float constant = 32.86335345030997f;
   return normValue / constant;
 }
@@ -341,6 +329,25 @@ std::complex<float> cosineDistance(const std::vector<std::complex<float>> &v1,
         return a * std::conj(b);
       });
 
-  std::complex<float> normsProduct = complexNorm(v1) * complexNorm(v2);
+  std::complex<float> normsProduct =
+      complexVectorNorm(v1) * complexVectorNorm(v2);
   return dotProduct / normsProduct;
+}
+
+float maxClassConsonance() {
+  float maxConsonance = 0.0f;
+  FixedVectorTwelveChromatic chromatic = chromaticVector();
+
+  for (size_t i = 0; i < chromatic.values.size(); ++i) {
+    // Apply toLocalInterpretation and tk6
+    // This is a placeholder. Replace with actual implementation.
+    auto toRealPart = [](const std::complex<float> &c) { return c.real(); };
+    std::vector<ZZ_12> v = {toZZ_12(chromatic.values[i])};
+    std::vector<std::complex<float>> tk6Result = tk6(v).to_vector();
+
+    float currentNorm = complexVectorNorm(tk6Result);
+    maxConsonance = std::max(maxConsonance, currentNorm);
+  }
+
+  return maxConsonance;
 }

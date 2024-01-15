@@ -1272,24 +1272,6 @@ std::tuple<int, int, int> _validateAddress(std::tuple<int, int, int> address) {
   return std::make_tuple(card, index, inversion);
 }
 
-std::vector<int> getPitchClassVector(std::vector<ZZ_12> pitchClasses) {
-  std::vector<int> intervalCounts(6, 0);
-
-  for (size_t i = 0; i < pitchClasses.size(); ++i) {
-    for (size_t j = i + 1; j < pitchClasses.size(); ++j) {
-      int interval = ZZ_12::getInterval(pitchClasses[i], pitchClasses[j]);
-      if (interval > 6) {
-        interval = 12 - interval; // Consider interval inversions
-      }
-      if (interval > 0 && interval <= 6) {
-        intervalCounts[interval - 1]++;
-      }
-    }
-  }
-
-  return intervalCounts;
-}
-
 template <size_t... Is> struct index_sequence {};
 
 template <size_t N, size_t... Is>

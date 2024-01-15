@@ -7,10 +7,10 @@
 
 template <uint MOD> class ZZ_Mod {
 private:
-  uint value;
+  int value;
 
-  uint mod(int input) const {
-    int result = input % MOD;
+  uint mod(uint input) const {
+    int result = static_cast<int>(input) % static_cast<int>(MOD);
     return result >= 0 ? result : result + MOD;
   }
 
@@ -18,26 +18,16 @@ public:
   ZZ_Mod() : value(0) {}
   explicit ZZ_Mod(uint v) : value(mod(v)) {}
 
-  uint unMod() const { return value; }
-  static int getInterval(ZZ_Mod a, ZZ_Mod b) {
-    uint larger = std::max(a.value, b.value);
-    uint smaller = std::min(a.value, b.value);
-    uint interval = larger - smaller;
-
-    if (interval > MOD / 2) {
-      interval = MOD - interval;
-    }
-    return static_cast<int>(interval);
-  }
+  uint unMod() const { return mod(value); }
 
   ZZ_Mod operator+(const ZZ_Mod &other) const {
-    return ZZ_Mod(mod(value + other.value));
+    return ZZ_Mod(value + other.value);
   }
   ZZ_Mod operator-(const ZZ_Mod &other) const {
-    return ZZ_Mod(mod(value - other.value));
+    return ZZ_Mod(value - other.value);
   }
   ZZ_Mod operator*(const ZZ_Mod &other) const {
-    return ZZ_Mod(mod(value * other.value));
+    return ZZ_Mod(value * other.value);
   }
   bool operator==(const ZZ_Mod &other) const { return value == other.value; }
   bool operator<(const ZZ_Mod &other) const { return value < other.value; }
@@ -75,7 +65,47 @@ std::string toStringHeptatonicScale(const HeptatonicScale &scale);
 HeptatonicScale getScaleByMode(ZZ_7 mode);
 // Enum representing the 12-tone chromatic scale
 enum class Chromatic { C, Cs, D, Eb, E, F, Fs, G, Gs, A, Bb, B };
-extern std::string toString(Chromatic note);
+// Function to convert Chromatic to string
+std::string toString(Chromatic note) {
+  switch (note) {
+  case Chromatic::C:
+    return "C";
+  case Chromatic::Cs:
+    return "C#";
+  case Chromatic::D:
+    return "D";
+  case Chromatic::Eb:
+    return "Eb";
+  case Chromatic::E:
+    return "E";
+  case Chromatic::F:
+    return "F";
+  case Chromatic::Fs:
+    return "F#";
+  case Chromatic::G:
+    return "G";
+  case Chromatic::Gs:
+    return "G#";
+  case Chromatic::A:
+    return "A";
+  case Chromatic::Bb:
+    return "Bb";
+  case Chromatic::B:
+    return "B";
+  default:
+    throw std::out_of_range("Invalid Chromatic note");
+  }
+}
 
-extern Chromatic toChromatic(ZZ_12 num);
-extern ZZ_12 toZZ_12(Chromatic note);
+// Function to convert uint to Chromatic (assuming 0 corresponds to C)
+Chromatic toChromatic(ZZ_12 num) {
+  uint n = num.unMod();
+  if (n >= 12) {
+    throw std::out_of_range(
+        "Number must be in the range 0-11 for Chromatic conversion");
+  }
+  return static_cast<Chromatic>(n);
+}
+
+// Function to convert Chromatic to ZZ_12
+ZZ_12 toZZ_12(Chromatic note) { return ZZ_12(static_cast<uint>(note)); }

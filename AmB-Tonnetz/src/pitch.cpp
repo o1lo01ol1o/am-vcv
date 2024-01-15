@@ -11,38 +11,6 @@
 #include <string>
 #include <vector>
 
-// Function to convert Chromatic to string
-std::string toString(Chromatic note) {
-  switch (note) {
-  case Chromatic::C:
-    return "C";
-  case Chromatic::Cs:
-    return "C#";
-  case Chromatic::D:
-    return "D";
-  case Chromatic::Eb:
-    return "Eb";
-  case Chromatic::E:
-    return "E";
-  case Chromatic::F:
-    return "F";
-  case Chromatic::Fs:
-    return "F#";
-  case Chromatic::G:
-    return "G";
-  case Chromatic::Gs:
-    return "G#";
-  case Chromatic::A:
-    return "A";
-  case Chromatic::Bb:
-    return "Bb";
-  case Chromatic::B:
-    return "B";
-  default:
-    throw std::out_of_range("Invalid Chromatic note");
-  }
-}
-
 std::string toStringHeptatonicScale(const HeptatonicScale &scale) {
   std::string result = "{";
   for (size_t i = 0; i < scale.notes.size(); ++i) {
@@ -87,16 +55,3 @@ HeptatonicScale getScaleByMode(ZZ_7 mode) {
     throw std::out_of_range("Invalid mode");
   }
 }
-
-// Function to convert uint to Chromatic (assuming 0 corresponds to C)
-Chromatic toChromatic(ZZ_12 num) {
-  uint n = num.unMod();
-  if (n >= 12) {
-    throw std::out_of_range(
-        "Number must be in the range 0-11 for Chromatic conversion");
-  }
-  return static_cast<Chromatic>(n);
-}
-
-// Function to convert Chromatic to ZZ_12
-ZZ_12 toZZ_12(Chromatic note) { return ZZ_12(static_cast<uint>(note)); }

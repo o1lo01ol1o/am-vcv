@@ -17,7 +17,7 @@
     RACK_DIR = (builtins.getEnv "PWD") + "/sdk/Rack-SDK";
     DATA_DIR = (builtins.getEnv "PWD") + "/data";
     DEVENV_FLAGS =
-      " -I ${pkgs.nlohmann_json}/include $(cat ${pkgs.stdenv.cc}/nix-support/cc-cflags) $(cat ${pkgs.stdenv.cc}/nix-support/libcxx-cxxflags) $(cat ${pkgs.stdenv.cc}/nix-support/libc-cflags)";
+      " -I ${pkgs.eigen}/include/eigen3/unsupported -I ${pkgs.eigen}/include/eigen3/Eigen -I ${pkgs.nlohmann_json}/include $(cat ${pkgs.stdenv.cc}/nix-support/cc-cflags) $(cat ${pkgs.stdenv.cc}/nix-support/libcxx-cxxflags) $(cat ${pkgs.stdenv.cc}/nix-support/libc-cflags)";
   };
   # https://devenv.sh/packages/
   packages = [
@@ -29,12 +29,14 @@
     pkgs.glew
     pkgs.jq
     pkgs.nlohmann_json
+    pkgs.eigen
   ];
 
   # https://devenv.sh/scripts/
   scripts.hello.exec = "echo hello from $GREET";
 
-  scripts.test.exec = "make clean && make test";
+  scripts.test.exec =
+    "DYLD_LIBRARY_PATH=/Users/timpierson/arity/am-vcv/sdk/Rack-SDK:$DYLD_LIBRARY_PATH make clean && make test";
 
   enterShell = ''
     hello

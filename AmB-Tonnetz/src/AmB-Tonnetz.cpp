@@ -7,6 +7,7 @@
 #include <functional>
 #include <iostream>
 #include <limits>
+#include <mutex>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <string>
@@ -58,10 +59,10 @@ using VertexZZ_12 = Vertex_<ZZ_12>;
 // the position in that coordinate
 int computePitch(const HeptatonicScale &scale, const VertexZZ_7 &intervals,
                  const Vertex &coord) {
-  return (scale[intervals.x.unMod()].unMod() * coord.x) +
-         (scale[intervals.y.unMod()].unMod() * coord.y) +
-         (scale[intervals.z.unMod()].unMod() * coord.z) +
-         (scale[intervals.w.unMod()].unMod() * coord.w);
+  return (static_cast<int>(scale[intervals.x.unMod()].unMod()) * coord.x) +
+         (static_cast<int>(scale[intervals.y.unMod()].unMod()) * coord.y) +
+         (static_cast<int>(scale[intervals.z.unMod()].unMod()) * coord.z) +
+         (static_cast<int>(scale[intervals.w.unMod()].unMod()) * coord.w);
 }
 
 std::string toStringVertex(const Vertex &v) {
@@ -93,34 +94,6 @@ struct VectorHash {
   }
 };
 
-// // Define a simple representation for the HeptatonicScale
-// // Define the HeptatonicScale struct
-// struct HeptatonicScale
-// {
-// 	std::vector<int> notes;
-
-// 	HeptatonicScale(std::initializer_list<int> init) : notes(init) {}
-
-// 	HeptatonicScale succMode() const
-// 	{
-// 		HeptatonicScale result = *this;
-// 		int first = result.notes[0];
-// 		for (size_t i = 0; i < result.notes.size() - 1; ++i)
-// 		{
-// 			result.notes[i] = result.notes[i + 1];
-// 		}
-// 		result.notes[result.notes.size() - 1] = first;
-// 		return result;
-// 	}
-
-// 	int operator[](int index) const
-// 	{
-// 		if (index < 0 || index >= static_cast<int>(notes.size()))
-// 			throw std::out_of_range("Index out of range");
-// 		return notes[index];
-// 	}
-// };
-
 void centerRuledLabel(NVGcontext *vg, float x0, float y0, float w,
                       const char *label, int size = 14, float fill = 0.5) {
   nvgBeginPath(vg);
@@ -146,7 +119,8 @@ public:
         padding(mm2px(0.5)){};
   std::vector<Polygon> polygons;
 
-  std::vector<Vertex> coordinatesOn;
+  std::set<Vertex> coordinatesOn;
+  std::mutex coordinatesMutex;
   std::unordered_map<std::vector<Vertex>, size_t, VectorHash> polygonIDs;
   std::pair<float, float> minExtent;
   std::pair<float, float> maxExtent;
@@ -222,7 +196,7 @@ public:
 
     float xOffset = widgetSize.x / 2;
     float yOffset = widgetSize.y / 2;
-
+    std::lock_guard<std::mutex> guard(coordinatesMutex);
     // Iterate over each polygon
     for (const auto &poly : polygons) {
       // Check if the polygon is clicked
@@ -307,11 +281,12 @@ public:
 
       if (isInsidePolygon(point, poly.faceVerts)) {
 
-        std::vector<Vertex> coordinatesOn_update;
+        std::set<Vertex> coordinatesOn_update;
         for (const auto &vertex : poly.vertexCoords) {
-          coordinatesOn_update.push_back(vertex);
+          coordinatesOn_update.insert(vertex);
         }
         if (coordinatesOn != coordinatesOn_update) {
+          std::lock_guard<std::mutex> guard(coordinatesMutex);
           coordinatesOn = coordinatesOn_update;
         }
       }
@@ -374,11 +349,29 @@ struct DragState {
   math::Vec current() { return position.plus(delta); }
 };
 
+std::string pitchLabel(int pitch, int baseOctave) {
+  int octave = baseOctave + (pitch / 12);
+  Chromatic chromatic = toChromatic(ZZ_12(pitch));
+  std::string label = toString(chromatic);
+  std::string octaveStr = std::to_string(octave);
+  return (label + octaveStr);
+}
+
+// return the number of semitones ot offset in in vcv rack
+int getBaseOctaveOffset(int baseOctave) {
+  int offset = baseOctave - 3;
+  return offset * 12;
+}
+
+enum Articulation { PORTO, STACCATO };
+
 struct TileUIWidget : OpaqueWidget {
   AmmannBeeknerTileUI tileUI;
   VertexZZ_7 intervals;
+  int baseOctave;
   ZZ_7 mode;
   DragState dragState;
+
   std::map<Vertex, std::string> labelMap;
   TileUIWidget() {
     // Load JSON data into tileUI
@@ -387,6 +380,8 @@ struct TileUIWidget : OpaqueWidget {
     tileUI.loadJSON(jsonPath);
     intervals = VertexZZ_7({0, 2, 4, 6});
     mode = ZZ_7(0);
+    baseOctave = 4;
+
     dragState = DragState({0, 0});
     computeLableMap();
   }
@@ -398,14 +393,15 @@ struct TileUIWidget : OpaqueWidget {
         if (labelMap.find(vertex) == labelMap.end()) {
 
           int pitch = computePitch(scale, intervals, vertex);
-          int octave = 3 + (pitch / 12);
-          Chromatic chromatic = toChromatic(ZZ_12(pitch));
-          std::string label = toString(chromatic);
-          std::string octaveStr = std::to_string(octave);
-          labelMap[vertex] = (label + octaveStr);
+          labelMap[vertex] = (pitchLabel(pitch, baseOctave));
         }
       }
     }
+  }
+
+  void setBaseOctave(const int base) {
+    baseOctave = base;
+    computeLableMap();
   }
   void setIntervals(const VertexZZ_7 ivals) {
     intervals = ivals;
@@ -430,6 +426,7 @@ struct TileUIWidget : OpaqueWidget {
         tileUI.checkAndAddPolygon(widgetSize, pos.x, pos.y);
       }
       if (e.action == GLFW_RELEASE) {
+        std::lock_guard<std::mutex> guard(tileUI.coordinatesMutex);
         tileUI.coordinatesOn.clear();
       }
     }
@@ -448,6 +445,8 @@ struct TileUIWidget : OpaqueWidget {
 struct AmB_Tonnetz : Module {
   TileUIWidget *tileUIWidget;
   int maxChannels;
+  Articulation articulation;
+  std::vector<int> midiNotes;
 
   enum ParamId { PARAMS_LEN };
   enum InputId { INPUTS_LEN };
@@ -467,38 +466,57 @@ struct AmB_Tonnetz : Module {
     configOutput(OUTPUT_DRAG_Y, "Mouse Y");
     configOutput(OUTPUT_OUTPUT, "CV");
     maxChannels = 4; // Max polyphony, adjust as needed
+    articulation = PORTO;
   }
-  void setTileUIWidget(TileUIWidget *w) {
-    DEBUG("setTileUIWidget in AmB_Tonnetz", "");
-    tileUIWidget = w;
-    DEBUG("done in AmB_Tonnetz", "");
-  }
+  void setTileUIWidget(TileUIWidget *w) { tileUIWidget = w; }
+
+  void setArticulation(Articulation arto) { articulation = arto; }
 
   std::vector<int> generateMidiNote() {
-    HeptatonicScale scale = getScaleByMode(tileUIWidget->mode);
-    std::vector<int> midiNotes;
-    if (tileUIWidget && !tileUIWidget->tileUI.coordinatesOn.empty()) {
-      for (auto &coord : tileUIWidget->tileUI.coordinatesOn) {
-        midiNotes.push_back(
-            computePitch(scale, tileUIWidget->intervals, coord));
+    std::vector<int> currentMidiNotes;
+    if (tileUIWidget) {
+      HeptatonicScale scale = getScaleByMode(tileUIWidget->mode);
+
+      std::lock_guard<std::mutex> guard(tileUIWidget->tileUI.coordinatesMutex);
+      if (!tileUIWidget->tileUI.coordinatesOn.empty()) {
+
+        std::set<Vertex> localCoords = tileUIWidget->tileUI.coordinatesOn;
+        for (auto &coord : localCoords) {
+
+          currentMidiNotes.push_back(
+              computePitch(scale, tileUIWidget->intervals, coord));
+        }
+      };
+      if (tileUIWidget->tileUI.coordinatesOn.empty()) {
+        currentMidiNotes.clear();
       }
-    };
-    if (tileUIWidget && tileUIWidget->tileUI.coordinatesOn.empty()) {
-      midiNotes.clear();
     }
-    return midiNotes;
+    return currentMidiNotes;
   }
 
   void process(const ProcessArgs &args) override {
     const float epsilon = 1e-6;
 
     if (tileUIWidget) {
-      std::vector<int> midiNotes = generateMidiNote(); // Vector of MIDI notes
+
+      bool needsRetrigger = false;
+      std::vector<int> newMidiNotes =
+          generateMidiNote(); // Vector of MIDI notes
+      if (articulation == STACCATO && newMidiNotes != midiNotes) {
+        needsRetrigger = true;
+      }
+      midiNotes = newMidiNotes;
+
       size_t notes_on = midiNotes.size();
       outputs[OUTPUT_OUTPUT].setChannels(notes_on);
       outputs[OUTPUT_GATE].setChannels(notes_on);
       for (size_t i = 0; i < notes_on; ++i) {
-        float cv = (midiNotes[i]) / 12.0f;
+
+        std::string noteString =
+            pitchLabel(midiNotes[i], tileUIWidget->baseOctave);
+        float cv =
+            (midiNotes[i] + getBaseOctaveOffset(tileUIWidget->baseOctave)) /
+            12.0f;
         float ccv = outputs[OUTPUT_OUTPUT].getVoltage(i);
 
         if (std::abs(cv - ccv) > epsilon) {
@@ -510,7 +528,7 @@ struct AmB_Tonnetz : Module {
       for (size_t i = notes_on; i < maxChannels; ++i) {
         outputs[OUTPUT_OUTPUT].setVoltage(0, i);
       }
-      if (notes_on > 0) {
+      if (notes_on > 0 && needsRetrigger == false) {
         for (size_t i = 0; i < notes_on && i < maxChannels; ++i) {
           float gv = outputs[OUTPUT_GATE].getVoltage(i);
           if (std::abs(gv - 10) > epsilon) {
@@ -536,6 +554,7 @@ struct ChordNameUIWidget : OpaqueWidget {
   std::vector<int> generateMidiNote() {
     HeptatonicScale scale = getScaleByMode(tileUIWidget->mode);
     std::vector<int> midiNotes;
+    std::lock_guard<std::mutex> guard(tileUIWidget->tileUI.coordinatesMutex);
     if (tileUIWidget && !tileUIWidget->tileUI.coordinatesOn.empty()) {
       for (auto &coord : tileUIWidget->tileUI.coordinatesOn) {
         midiNotes.push_back(
@@ -585,6 +604,7 @@ struct ChordNameUIWidget : OpaqueWidget {
 struct AmB_TonnetzWidget : ModuleWidget {
   TileUIWidget *tileUIWidget;
   ChordNameUIWidget *chordNameWidget;
+  AmB_Tonnetz *tmodule;
   AmB_TonnetzWidget(AmB_Tonnetz *module)
 
   {
@@ -615,6 +635,7 @@ struct AmB_TonnetzWidget : ModuleWidget {
     addChild(tileUIWidget);
     if (module) {
       module->setTileUIWidget(tileUIWidget);
+      tmodule = module;
     }
     chordNameWidget = createWidget<ChordNameUIWidget>(Vec(600, 100));
 
@@ -627,6 +648,17 @@ struct AmB_TonnetzWidget : ModuleWidget {
     menu->addChild(new MenuSeparator);
 
     menu->addChild(createMenuLabel("Tonnnetz Settings"));
+
+    menu->addChild(createSubmenuItem("Base Octave", "", [=](Menu *menu) {
+      menu->addChild(
+          createMenuItem("2", "", [=]() { tileUIWidget->setBaseOctave(2); }));
+      menu->addChild(
+          createMenuItem("3", "", [=]() { tileUIWidget->setBaseOctave(3); }));
+      menu->addChild(
+          createMenuItem("4", "", [=]() { tileUIWidget->setBaseOctave(4); }));
+      menu->addChild(
+          createMenuItem("5", "", [=]() { tileUIWidget->setBaseOctave(5); }));
+    }));
 
     menu->addChild(createSubmenuItem("Mode", "", [=](Menu *menu) {
       menu->addChild(
@@ -701,6 +733,15 @@ struct AmB_TonnetzWidget : ModuleWidget {
         tileUIWidget->setIntervals(VertexZZ_7({0, 2, 4, 6}));
       }));
     }));
+
+    if (tmodule) {
+      menu->addChild(createSubmenuItem("Articulation", "", [=](Menu *menu) {
+        menu->addChild(createMenuItem(
+            "Portomento", "", [=]() { tmodule->setArticulation(PORTO); }));
+        menu->addChild(createMenuItem(
+            "Staccato", "", [=]() { tmodule->setArticulation(STACCATO); }));
+      }));
+    }
 
     // // Controls int Module::mode
     // menu->addChild(createIndexPtrSubmenuItem("Mode",
