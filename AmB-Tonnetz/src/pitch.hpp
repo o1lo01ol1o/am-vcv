@@ -1,3 +1,5 @@
+#ifndef pitch_H
+#define pitch_H
 #pragma once
 #include "plugin.hpp"
 #include <initializer_list>
@@ -66,7 +68,7 @@ HeptatonicScale getScaleByMode(ZZ_7 mode);
 // Enum representing the 12-tone chromatic scale
 enum class Chromatic { C, Cs, D, Eb, E, F, Fs, G, Gs, A, Bb, B };
 // Function to convert Chromatic to string
-std::string toString(Chromatic note) {
+inline std::string toString(Chromatic note) {
   switch (note) {
   case Chromatic::C:
     return "C";
@@ -98,7 +100,7 @@ std::string toString(Chromatic note) {
 }
 
 // Function to convert uint to Chromatic (assuming 0 corresponds to C)
-Chromatic toChromatic(ZZ_12 num) {
+inline Chromatic toChromatic(ZZ_12 num) {
   uint n = num.unMod();
   if (n >= 12) {
     throw std::out_of_range(
@@ -108,4 +110,6 @@ Chromatic toChromatic(ZZ_12 num) {
 }
 
 // Function to convert Chromatic to ZZ_12
-ZZ_12 toZZ_12(Chromatic note) { return ZZ_12(static_cast<uint>(note)); }
+inline ZZ_12 toZZ_12(Chromatic note) { return ZZ_12(static_cast<uint>(note)); }
+
+#endif // HEADER_FILE_NAME_H

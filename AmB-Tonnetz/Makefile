@@ -9,7 +9,9 @@ FLAGS += ${DEVENV_FLAGS}
 
 # Careful about linking to shared libraries, since you can't assume much about the user's environment and library search path.
 # Static libraries are fine, but they should be added to this plugin's build system.
-# LDFLAGS +=
+# TODO: gotta somehow get open cv included or built statically. we only use cv::Mat though . . .
+LDFLAGS += ${DEVENV_OPENCV_FLAGS}
+
 
 # Add .cpp files to the build
 SOURCES += $(wildcard src/*.cpp)

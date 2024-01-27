@@ -16,8 +16,10 @@
 
     RACK_DIR = (builtins.getEnv "PWD") + "/sdk/Rack-SDK";
     DATA_DIR = (builtins.getEnv "PWD") + "/data";
+    DEVENV_OPENCV_FLAGS =
+      "-L ${pkgs.opencv3}/lib -lopencv_core -lopencv_imgproc -lopencv_highgui";
     DEVENV_FLAGS =
-      " -I ${pkgs.eigen}/include/eigen3/unsupported -I ${pkgs.eigen}/include/eigen3/Eigen -I ${pkgs.nlohmann_json}/include $(cat ${pkgs.stdenv.cc}/nix-support/cc-cflags) $(cat ${pkgs.stdenv.cc}/nix-support/libcxx-cxxflags) $(cat ${pkgs.stdenv.cc}/nix-support/libc-cflags)";
+      " -I ${pkgs.opencv3}/include -I ${pkgs.eigen}/include/eigen3/unsupported -I ${pkgs.eigen}/include/eigen3/Eigen -I ${pkgs.nlohmann_json}/include $(cat ${pkgs.stdenv.cc}/nix-support/cc-cflags) $(cat ${pkgs.stdenv.cc}/nix-support/libcxx-cxxflags) $(cat ${pkgs.stdenv.cc}/nix-support/libc-cflags)";
   };
   # https://devenv.sh/packages/
   packages = [
@@ -30,6 +32,7 @@
     pkgs.jq
     pkgs.nlohmann_json
     pkgs.eigen
+    pkgs.opencv3
   ];
 
   # https://devenv.sh/scripts/

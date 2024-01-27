@@ -139,6 +139,127 @@ FixedVectorTwelveComplex cs(const std::vector<ZZ_12> &mods) {
 
   return result;
 }
+
+std::complex<float>
+euclideanDistance(const std::vector<std::complex<float>> &v1,
+                  const std::vector<std::complex<float>> &v2) {
+  if (v1.size() != v2.size() || v1.empty()) {
+    throw std::invalid_argument(
+        "Vectors must be of the same size and not empty.");
+  }
+  std::complex<float> sum = 0.0f;
+  for (size_t i = 0; i < v1.size(); ++i) {
+    sum += std::pow(v1[i] - v2[i], 2);
+  }
+  return std::sqrt(sum);
+}
+
+// Function to take the norm of a complex vector
+float complexVectorNorm(const std::vector<std::complex<float>> &vec) {
+  float norm = 0.0f;
+  for (const auto &val : vec) {
+    norm += std::norm(val);
+  }
+  return std::sqrt(norm);
+}
+
+float cosineDistance(const std::vector<std::complex<float>> &v1,
+                     const std::vector<std::complex<float>> &v2) {
+  if (v1.size() != v2.size() || v1.empty()) {
+    throw std::invalid_argument(
+        "Vectors must be of the same size and not empty.");
+  }
+  std::complex<float> dotProduct = std::inner_product(
+      v1.begin(), v1.end(), v2.begin(), std::complex<float>(0, 0),
+      std::plus<std::complex<float>>(),
+      [](const std::complex<float> &a, const std::complex<float> &b) {
+        return a * std::conj(b);
+      });
+
+  std::complex<float> normsProduct =
+      complexVectorNorm(v1) * complexVectorNorm(v2);
+  const float epsilon = 1e-6f; // Threshold for numerical stability
+  if (std::abs(normsProduct) < epsilon) {
+    throw std::runtime_error("The norms product is close to zero, which may "
+                             "cause numerical instability.");
+  }
+  if (normsProduct == 0.0f) {
+    throw std::runtime_error(
+        "The norms product is zero, which will cause division by zero.");
+  }
+  std::complex<float> cosine = dotProduct / normsProduct;
+
+  // Return the phase angle in radians
+  return std::arg(cosine);
+}
+float const EUCLIDEAN_NORM = 20.0f;
+
+float normalizeEuclidean(float value) {
+  if (value < 0.0f)
+    throw std::invalid_argument("Value must be positive.");
+
+  float normalized = value;
+  if (value > EUCLIDEAN_NORM) {
+    // Squash the value using a sigmoid function and add to 30
+    normalized =
+        EUCLIDEAN_NORM + (1.0f / (1.0f + std::exp(-(value - EUCLIDEAN_NORM))));
+  }
+
+  // Linearly interpolate the result to be between 0 and 1
+  float result = normalized /
+                 (EUCLIDEAN_NORM + (1.0f / (1.0f + std::exp(EUCLIDEAN_NORM))));
+  return (std::min(result, 1.0f));
+}
+
+float radiansToNormalizedFloat(float radians) {
+  // Normalize radians to be within the range [-π, π]
+  float normalizedRadians = std::fmod(radians, 2.0f * static_cast<float>(M_PI));
+  if (normalizedRadians > M_PI) {
+    normalizedRadians -= 2.0f * static_cast<float>(M_PI);
+  } else if (normalizedRadians < -M_PI) {
+    normalizedRadians += 2.0f * static_cast<float>(M_PI);
+  }
+
+  // Convert the normalized radians to a float in the range [-1, 1]
+  float normalizedFloat = normalizedRadians / static_cast<float>(M_PI);
+  return normalizedFloat;
+}
+
+float normalizeCosine(float cosineValue) {
+  if (cosineValue < -1.0f || cosineValue > 1.0f)
+    throw std::invalid_argument("Cosine value must be in the range [-1, 1].");
+
+  // Scale the cosine value from [-1, 1] to [0, 1]
+  return (cosineValue + 1.0f) / 2.0f;
+}
+
+struct TIP {
+  FixedVectorSixComplex vector;
+  std::complex<float> energy;
+  TIP()
+      : vector(FixedVectorSixComplex()),
+        energy(std::complex<float>(0.0f, 0.0f)) {}
+
+  TIP(const FixedVectorSixComplex &vec, const std::complex<float> &en)
+      : vector(vec), energy(en) {}
+  float cosineDistanceTo(const TIP &other) const {
+    return normalizeCosine(
+        cosineDistance(this->vector.to_vector(), other.vector.to_vector()));
+  }
+
+  float euclideanDistanceTo(const TIP &other) const {
+    return normalizeEuclidean(std::abs(
+        euclideanDistance(this->vector.to_vector(), other.vector.to_vector())));
+  }
+
+  std::string to_string() const {
+    std::ostringstream oss;
+    oss << "TIP { vector: " << vector.to_string() << ", energy: " << energy
+        << " }";
+    return oss.str();
+  }
+};
+
 FixedVector<std::complex<float>, 12>
 naiveDft(const FixedVector<std::complex<float>, 12> &input) {
   Eigen::VectorXcf eigenInput(12);
@@ -159,73 +280,6 @@ naiveDft(const FixedVector<std::complex<float>, 12> &input) {
 
   return output;
 }
-
-// FixedVector<std::complex<float>, 12> naiveDft(const
-// FixedVector<std::complex<float>, 12> &input)
-// {
-//   // PFFFT only supports sizes that are powers of 2, so we pad our array to
-//   16 std::array<std::complex<float>, 16> paddedInput;
-//   std::copy(input.values.begin(), input.values.end(), paddedInput.begin());
-//   std::fill(paddedInput.begin() + 12, paddedInput.end(),
-//   std::complex<float>(0.0f, 0.0f));
-
-//   // Initialize PFFFT setup for a 1D complex transform of size 16
-//   PFFFT_Setup *setup = pffft_new_setup(16, PFFFT_COMPLEX);
-//   if (!setup)
-//   {
-//     throw std::runtime_error("Failed to initialize PFFFT setup");
-//   }
-
-//   // Allocate aligned memory for the transform
-//   float *paddedInputData = (float *)pffft_aligned_malloc(16 * 2 *
-//   sizeof(float)); float *transformedData = (float *)pffft_aligned_malloc(16 *
-//   2 * sizeof(float));
-
-//   // Copy our complex input data into the real and imaginary parts of the
-//   aligned input array for (size_t i = 0; i < paddedInput.size(); ++i)
-//   {
-//     paddedInputData[2 * i] = paddedInput[i].real();
-//     paddedInputData[2 * i + 1] = paddedInput[i].imag();
-//   }
-
-//   // Perform the forward Fourier transform
-//   pffft_transform_ordered(setup, paddedInputData, transformedData, nullptr,
-//   PFFFT_FORWARD);
-
-//   // Copy the transformed data back into a FixedVector
-//   FixedVector<std::complex<float>, 12> output;
-//   for (size_t i = 0; i < 12; ++i)
-//   {
-//     output.values[i] = std::complex<float>(transformedData[2 * i],
-//     transformedData[2 * i + 1]);
-//   }
-
-//   // Free the allocated memory and destroy the PFFFT setup
-//   pffft_aligned_free(paddedInputData);
-//   pffft_aligned_free(transformedData);
-//   pffft_destroy_setup(setup);
-
-//   return output;
-// }
-
-// FixedVector<std::complex<float>, 12>
-// naiveDft(const FixedVector<std::complex<float>, 12> &input)
-// {
-//   FixedVector<std::complex<float>, 12> output;
-//   const size_t N = 12;
-//   for (size_t k = 0; k < N; ++k)
-//   {
-//     std::complex<float> sum(0.0f, 0.0f);
-//     for (size_t n = 0; n < N; ++n)
-//     {
-//       float angle = 2 * M_PI * k * n / N;
-//       std::complex<float> w(std::cos(angle), -std::sin(angle));
-//       sum += input.values[n] * w;
-//     }
-//     output.values[k] = sum;
-//   }
-//   return output;
-// }
 
 // Define the list 'ws' as a constant array
 const std::array<int, 6> ws = {2, 11, 17, 16, 19, 7};
@@ -254,15 +308,16 @@ cbar(const FixedVectorTwelveComplex &cs_prime) {
   return normalized_cs_prime;
 }
 
-FixedVectorSixComplex tk6_prime(const FixedVectorTwelveComplex &cs_prime) {
+TIP tk6_prime(const FixedVectorTwelveComplex &cs_prime) {
 
   // Perform DFT on the input
-  auto dft_result = naiveDft(cbar(cs_prime));
-  if (dft_result.values[0] !=
+  FixedVectorTwelveComplex dft_result = naiveDft(cbar(cs_prime));
+  std::complex<float> energy = dft_result.values[0];
+  if (energy !=
       std::complex<float>(0, 0)) // Check if the first element is not zero
   {
-    for (auto &val : dft_result.values) {
-      val /= dft_result.values[0]; // Divide each element by the first element
+    for (std::complex<float> &val : dft_result.values) {
+      val /= energy; // Divide each element by the first element
     }
   }
 
@@ -272,20 +327,11 @@ FixedVectorSixComplex tk6_prime(const FixedVectorTwelveComplex &cs_prime) {
     result.values[i - 1] =
         (std::complex<float>(w(i - 1), 0)) * dft_result.values[i];
   }
-
-  return result;
+  TIP ret(result, energy);
+  return ret;
 }
 
-// Function to take the norm of a complex vector
-float complexVectorNorm(const std::vector<std::complex<float>> &vec) {
-  float norm = 0.0f;
-  for (const auto &val : vec) {
-    norm += std::norm(val);
-  }
-  return std::sqrt(norm);
-}
-
-FixedVectorSixComplex tk6(const std::vector<ZZ_12> &ns) {
+TIP tk6(const std::vector<ZZ_12> &ns) {
   auto cs_prime =
       cs(ns); // Assuming 'cs' returns a FixedVector of appropriate type
   return tk6_prime(cs_prime);
@@ -293,45 +339,19 @@ FixedVectorSixComplex tk6(const std::vector<ZZ_12> &ns) {
 
 float consonance(const std::vector<ZZ_12> &xs) {
   // Apply tk6 to the pitch classes.
-  std::vector<std::complex<float>> tk6Result = (tk6(xs)).to_vector();
+  std::vector<std::complex<float>> tk6Result = (tk6(xs)).vector.to_vector();
 
   // Calculate the norm of the tk6Result.
 
   float normValue = complexVectorNorm(tk6Result);
 
-  // Divide by the constant value.
-  // const float constant = 32.86335345030997f;
-  return normValue; // / constant;
+  return normValue;
 }
 
 float normalizedConsonance(const std::vector<ZZ_12> &xs) {
   float normValue = consonance(xs);
   const float constant = 32.86335345030997f;
   return normValue / constant;
-}
-
-std::complex<float>
-euclideanDistance(const std::vector<std::complex<float>> &v1,
-                  const std::vector<std::complex<float>> &v2) {
-  std::complex<float> sum = 0.0f;
-  for (size_t i = 0; i < v1.size(); ++i) {
-    sum += std::pow(v1[i] - v2[i], 2);
-  }
-  return std::sqrt(sum);
-}
-
-std::complex<float> cosineDistance(const std::vector<std::complex<float>> &v1,
-                                   const std::vector<std::complex<float>> &v2) {
-  std::complex<float> dotProduct = std::inner_product(
-      v1.begin(), v1.end(), v2.begin(), std::complex<float>(0, 0),
-      std::plus<std::complex<float>>(),
-      [](const std::complex<float> &a, const std::complex<float> &b) {
-        return a * std::conj(b);
-      });
-
-  std::complex<float> normsProduct =
-      complexVectorNorm(v1) * complexVectorNorm(v2);
-  return dotProduct / normsProduct;
 }
 
 float maxClassConsonance() {
@@ -343,7 +363,7 @@ float maxClassConsonance() {
     // This is a placeholder. Replace with actual implementation.
     auto toRealPart = [](const std::complex<float> &c) { return c.real(); };
     std::vector<ZZ_12> v = {toZZ_12(chromatic.values[i])};
-    std::vector<std::complex<float>> tk6Result = tk6(v).to_vector();
+    std::vector<std::complex<float>> tk6Result = tk6(v).vector.to_vector();
 
     float currentNorm = complexVectorNorm(tk6Result);
     maxConsonance = std::max(maxConsonance, currentNorm);

@@ -1,10 +1,11 @@
-
-#include "tps.hpp"
+#include <fstream>
+#ifdef TEST
 #include "../../sdk/Rack-SDK/dep/include/nanovg.h"
 #include "../../sdk/Rack-SDK/dep/include/pffft.h"
 #include "pitch.hpp"
 #include "plugin.hpp"
 #include "rack.hpp"
+#include "tps.hpp"
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -66,8 +67,8 @@ void findMinMaxMetric(MetricFunction metric) {
 
   for (size_t i = 0; i < allVectors.size(); ++i) {
     for (size_t j = i + 1; j < allVectors.size(); ++j) {
-      auto dft1 = tk6(allVectors[i]).to_vector();
-      auto dft2 = tk6(allVectors[j]).to_vector();
+      auto dft1 = tk6(allVectors[i]).vector.to_vector();
+      auto dft2 = tk6(allVectors[j]).vector.to_vector();
       float distance = std::abs(metric(dft1, dft2));
 
       if (distance < minDistance) {
@@ -126,7 +127,7 @@ void testTk6Prime() {
   FixedVector<Chromatic, 2> intervalVector({Chromatic::C, Chromatic::Cs});
   std::vector<ZZ_12> pitches = intervalVector.map(toZZ_12).to_vector();
   FixedVectorTwelveComplex cs_values = cs(pitches);
-  FixedVectorSixComplex tk6_prime_result = tk6_prime(cs_values);
+  FixedVectorSixComplex tk6_prime_result = tk6_prime(cs_values).vector;
 
   const std::vector<std::complex<float>> expected_result = {
       std::complex<float>(2.00f, 0.00f),   std::complex<float>(10.26f, -2.75f),
@@ -190,8 +191,6 @@ void testConsonanceIntervals() {
     }
   }
 }
-
-#ifdef TEST
 
 void testConsonance() {
   // Representing the pitches [C, F, Bb] - adjust these values to your actual
