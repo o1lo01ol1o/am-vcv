@@ -274,15 +274,17 @@ public:
           const float euclideanD = thisTip.euclideanDistanceTo(tipOn);
           // These logs indicate that there are various values of euclideanD in
           // the loop.
-          DEBUG("Euclidean distance: %f", euclideanD);
-
-          NVGcolor nearlyWhiteGreen = nvgRGBf(0.9f, 1.0f, 0.9f);
-          NVGcolor deepBlue = nvgRGBf(0.0f, 0.0f, 0.5f);
-          if (euclideanD > 0.7) {
-            polyFillColor = nvgRGB(255, 0, 0); // Red color
-          } else {
-            polyFillColor = nvgLerpRGBA(deepBlue, nearlyWhiteGreen, euclideanD);
-          }
+          // DEBUG("Euclidean distance: %f", euclideanD);
+          RGBLinearInterpolator bginterp =
+              RGBLinearInterpolator(0.9f, 1.0f, 0.9f, 0.0f, 0.0f, 0.9f);
+          const std::tuple<float, float, float> rgbf =
+              bginterp.interpolate(euclideanD);
+          polyFillColor =
+              nvgRGBf(std::get<0>(rgbf), std::get<1>(rgbf), std::get<2>(rgbf));
+          // NVGcolor nearlyWhiteGreen = nvgRGBf(0.9f, 1.0f, 0.9f);
+          // NVGcolor deepBlue = nvgRGBf(0.0f, 0.0f, 0.9f);
+          // polyFillColor = nvgLerpRGBA(deepBlue, nearlyWhiteGreen,
+          // euclideanD);
         } else {
           polyFillColor = nvgRGBA(255, 255, 255, 255);
         }
@@ -292,36 +294,24 @@ public:
                                        // otherwise}
         fillColors[poly] = isClickedFillColor;
       }
-      if (!coordinatesOn.empty()) {
-        std::set<NVGcolor> uniqueColors;
-        for (const auto &colorPair : fillColors) {
-          uniqueColors.insert(colorPair.second);
-        }
-        int uniqueColorCount = uniqueColors.size();
-        DEBUG("Unique color count: %d", uniqueColorCount);
-      }
     }
 
     std::set<Vertex> seenVertices;
     // Iterate over each polygon
     for (const auto &poly : polygons) {
+      const NVGcolor fillColor = fillColors[poly];
       nvgSave(vg);
 
       // Start drawing a path
       nvgBeginPath(vg);
-
-      nvgStrokeColor(vg, nvgRGBf(0.88, 0.88, 0.88));
-      nvgStrokeWidth(vg, 1.0);
       nvgLineJoin(vg, NVG_MITER);
-      // These logs indicate there are more than one color being accessed
-      // accross the loop by fillColors[poly]
-      DEBUG("filling color: %s", nvcolor_to_string(fillColors[poly]).c_str());
-      nvgFillColor(vg, fillColors[poly]);
+
       bool firstVertex = true;
 
       // Draw each vertex of the polygon
       float x, y;
       for (const auto &vert : poly.faceVerts) {
+
         x = xOffset + padding + vert.first * xScale;
         y = yOffset + padding + vert.second * yScale;
 
@@ -334,10 +324,38 @@ public:
       }
 
       // Close the path and fill
+      // These logs indicate there are more than one color being accessed
+      // accross the loop by fillColors[poly]
+      // DEBUG("filling color: %s", nvcolor_to_string(fillColor).c_str());
+
+      nvgFillColor(vg, fillColor);
+      nvgClosePath(vg);
+      nvgFill(vg);
+
+      nvgRestore(vg);
+      nvgSave(vg);
+      // Start drawing a path
+      nvgBeginPath(vg);
+
+      nvgStrokeColor(vg, nvgRGBf(0.88, 0.88, 0.88));
+      nvgStrokeWidth(vg, 1.0);
+      nvgLineJoin(vg, NVG_MITER);
+
+      firstVertex = true;
+
+      for (const auto &vert : poly.faceVerts) {
+        x = xOffset + padding + vert.first * xScale;
+        y = yOffset + padding + vert.second * yScale;
+
+        if (firstVertex) {
+          nvgMoveTo(vg, x, y);
+          firstVertex = false;
+        } else {
+          nvgLineTo(vg, x, y);
+        }
+      }
       nvgClosePath(vg);
       nvgStroke(vg);
-      nvgFillColor(vg, fillColors[poly]);
-      nvgFill(vg);
 
       nvgRestore(vg);
     }
@@ -345,6 +363,7 @@ public:
     float r = 7;
 
     for (const auto &poly : polygons) {
+      const NVGcolor fillColor = fillColors[poly];
       for (size_t i = 0; i < poly.vertexCoords.size(); i++) {
 
         const Vertex &vertex = poly.vertexCoords[i];
@@ -367,26 +386,29 @@ public:
           nvgStroke(vg);
           centerRuledLabel(vg, x - (r / 2), y, r, it->second.c_str(), 11);
           seenVertices.insert(vertex);
-          if (fillColors[poly].r < 1.0 || fillColors[poly].g > 0.0 ||
-              fillColors[poly].b > 0.0) {
-            // Calculate the center of the polygon to place the label
-            float labelX = 0.0f;
-            float labelY = 0.0f;
-            float r = 10;
-            int vertexCount = 0;
-            for (const auto &vert : poly.faceVerts) {
-              labelX += xOffset + padding + vert.first * xScale;
-              labelY += yOffset + padding + vert.second * yScale;
-              vertexCount++;
-            }
-            labelX /= vertexCount;
-            labelY /= vertexCount;
-
-            // Set the label with the color string
-            std::string colorLabel = nvcolor_to_string(fillColors[poly]);
-            centerRuledLabel(vg, labelX - (r / 2), labelY, r,
-                             colorLabel.c_str(), 11);
+          // Calculate the center of the polygon to place the label
+          float labelX = 0.0f;
+          float labelY = 0.0f;
+          float r = 10;
+          int vertexCount = 0;
+          for (const auto &vert : poly.faceVerts) {
+            labelX += xOffset + padding + vert.first * xScale;
+            labelY += yOffset + padding + vert.second * yScale;
+            vertexCount++;
           }
+          labelX /= vertexCount;
+          labelY /= vertexCount;
+
+          // Set the label with the color string
+          // std::string colorLabel = nvcolor_to_string(fillColor);
+          // centerRuledLabel(vg, labelX - (r / 2), labelY, r,
+          //                  colorLabel.c_str(), 11);
+          nvgBeginPath(vg);
+          float hw = 16;
+          nvgRect(vg, labelX - (0.5 * hw), labelY - (0.5 * hw), hw, hw);
+          nvgFillColor(vg, fillColor); // This rectangle will be filled with the
+                                       // correct color.
+          nvgFill(vg);
         }
       }
     }
