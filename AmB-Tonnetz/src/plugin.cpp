@@ -13,4 +13,5 @@ void init(Plugin *p) {
   p->addModel(modelAmB_Tonnetz);
 
   // Any other plugin initialization...
+  p->addModel(modelBaconTest);
 }

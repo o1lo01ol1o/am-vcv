@@ -1,0 +1,11 @@
+Test passed: cs function works as expected.
+Expected value: 32.8634, Actual value: 32.8634
+Test passed.
+All DFT output values match the expected output within the given tolerance.
+Consonance test passed for interval: C to C
+Consonance test passed for interval: C to C#
+Consonance test passed for interval: C to D
+Consonance test passed for interval: C to Eb
+Consonance test passed for interval: C to E
+Consonance test passed for interval: C to F
+Consonance test passed for interval: C to F#

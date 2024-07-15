@@ -13,4 +13,19 @@ struct RGBLinearInterpolator {
   std::tuple<float, float, float> interpolate(float t) const;
 };
 
+struct DualRGBLinearInterpolator {
+  RGBLinearInterpolator positiveInterpolator;
+  RGBLinearInterpolator negativeInterpolator;
+
+  DualRGBLinearInterpolator(const RGBLinearInterpolator &posInterp,
+                            const RGBLinearInterpolator &negInterp);
+  DualRGBLinearInterpolator(double pureOrangeR, double pureOrangeG,
+                            double pureOrangeB, double nearlyWhiteGreenR,
+                            double nearlyWhiteGreenG, double nearlyWhiteGreenB,
+                            double pureVioletR, double pureVioletG,
+                            double pureVioletB);
+
+  std::tuple<float, float, float> interpolate(float t) const;
+};
+
 #endif // RGBLINEARINTERPOLATOR_H

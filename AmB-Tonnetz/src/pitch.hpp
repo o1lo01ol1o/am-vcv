@@ -41,6 +41,7 @@ public:
 using ZZ_7 = ZZ_Mod<7>;
 using ZZ_12 = ZZ_Mod<12>;
 
+std::string to_mode_string(const ZZ_7 &mode);
 // Define the HeptatonicScale struct using ZZ_12
 struct HeptatonicScale {
   std::vector<ZZ_12> notes;

@@ -178,10 +178,9 @@ float cosineDistance(const std::vector<std::complex<float>> &v1,
 
   std::complex<float> normsProduct =
       complexVectorNorm(v1) * complexVectorNorm(v2);
-  const float epsilon = 1e-6f; // Threshold for numerical stability
+  const float epsilon = 1e-10f; // Threshold for numerical stability
   if (std::abs(normsProduct) < epsilon) {
-    throw std::runtime_error("The norms product is close to zero, which may "
-                             "cause numerical instability.");
+    normsProduct += std::complex<float>(epsilon, epsilon);
   }
   if (normsProduct == 0.0f) {
     throw std::runtime_error(
@@ -190,9 +189,9 @@ float cosineDistance(const std::vector<std::complex<float>> &v1,
   std::complex<float> cosine = dotProduct / normsProduct;
 
   // Return the phase angle in radians
-  return std::arg(cosine);
+  return std::arg(cosine) / static_cast<float>(M_PI);
 }
-float const EUCLIDEAN_NORM = 20.0f;
+float const EUCLIDEAN_NORM = 32.0f;
 
 float normalizeEuclidean(float value) {
   if (value < 0.0f)
@@ -211,23 +210,9 @@ float normalizeEuclidean(float value) {
   return (std::min(result, 1.0f));
 }
 
-float radiansToNormalizedFloat(float radians) {
-  // Normalize radians to be within the range [-π, π]
-  float normalizedRadians = std::fmod(radians, 2.0f * static_cast<float>(M_PI));
-  if (normalizedRadians > M_PI) {
-    normalizedRadians -= 2.0f * static_cast<float>(M_PI);
-  } else if (normalizedRadians < -M_PI) {
-    normalizedRadians += 2.0f * static_cast<float>(M_PI);
-  }
-
-  // Convert the normalized radians to a float in the range [-1, 1]
-  float normalizedFloat = normalizedRadians / static_cast<float>(M_PI);
-  return normalizedFloat;
-}
-
 float normalizeCosine(float cosineValue) {
   if (cosineValue < -1.0f || cosineValue > 1.0f)
-    throw std::invalid_argument("Cosine value must be in the range [-1, 1].");
+    cosineValue = std::max(-1.0f, std::min(cosineValue, 1.0f));
 
   // Scale the cosine value from [-1, 1] to [0, 1]
   return (cosineValue + 1.0f) / 2.0f;
@@ -244,13 +229,14 @@ struct TIP {
       : vector(vec), energy(en) {}
   float cosineDistanceTo(const TIP &other) const {
     return normalizeCosine(
-        cosineDistance(this->vector.to_vector(), other.vector.to_vector()));
+        cosineDistance(vector.to_vector(), other.vector.to_vector()));
   }
 
   float euclideanDistanceTo(const TIP &other) const {
     return normalizeEuclidean(std::abs(
-        euclideanDistance(this->vector.to_vector(), other.vector.to_vector())));
+        euclideanDistance(vector.to_vector(), other.vector.to_vector())));
   }
+  float consonanceOf() const { return complexVectorNorm(vector.to_vector()); }
 
   std::string to_string() const {
     std::ostringstream oss;
@@ -271,13 +257,10 @@ naiveDft(const FixedVector<std::complex<float>, 12> &input) {
   Eigen::VectorXcf eigenOutput(12);
   fft.fwd(eigenOutput, eigenInput);
 
-  // Eigen::VectorXcf eigenOutput = eigenInput.fft();
-
   FixedVector<std::complex<float>, 12> output;
   for (int i = 0; i < 12; ++i) {
     output.values[i] = eigenOutput(i);
   }
-
   return output;
 }
 

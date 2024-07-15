@@ -18,3 +18,8 @@ devenv.local.nix
 testBin
 testBin.d
 .DS_Store
+
+
+# Added by cargo
+
+/target

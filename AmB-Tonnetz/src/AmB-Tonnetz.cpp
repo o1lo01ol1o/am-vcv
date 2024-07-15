@@ -1,4 +1,3 @@
-#include "../../sdk/Rack-SDK/dep/include/nanovg.h"
 #include "RGBLinearInterpolator.hpp"
 #include "chord.hpp"
 #include "plugin.hpp"
@@ -94,6 +93,11 @@ std::string toStringVertex(const Vertex &v) {
   return "(" + std::to_string(v.x) + ", " + std::to_string(v.y) + ", " +
          std::to_string(v.z) + ", " + std::to_string(v.w) + ")";
 }
+std::string toStringVertex(const VertexZZ_7 &v) {
+  return "(" + std::to_string(v.x.unMod()) + ", " +
+         std::to_string(v.y.unMod()) + ", " + std::to_string(v.z.unMod()) +
+         ", " + std::to_string(v.w.unMod()) + ")";
+}
 
 struct Polygon {
   std::vector<std::pair<float, float>> faceVerts; // 2D vertices
@@ -141,6 +145,51 @@ void centerRuledLabel(NVGcontext *vg, float x0, float y0, float w,
   nvgTextBounds(vg, x0 + w / 2, y0, label, NULL, bounds);
 };
 
+NVGcolor
+convertToNVGColor(const std::tuple<double, double, double> &colorTuple) {
+  const unsigned char r =
+      static_cast<unsigned char>(std::floor(std::get<0>(colorTuple) * 255));
+  const unsigned char g =
+      static_cast<unsigned char>(std::floor(std::get<1>(colorTuple) * 255));
+  const unsigned char b =
+      static_cast<unsigned char>(std::floor(std::get<2>(colorTuple) * 255));
+  return nvgRGB(r, g, b);
+};
+
+struct TempPolygon {
+  Polygon originalPolygon;
+  std::vector<std::pair<float, float>> sortedFaceVerts;
+
+  TempPolygon(const Polygon &poly)
+      : originalPolygon(poly), sortedFaceVerts(poly.faceVerts) {
+    std::sort(sortedFaceVerts.begin(), sortedFaceVerts.end());
+  }
+
+  bool operator<(const TempPolygon &other) const {
+    return sortedFaceVerts < other.sortedFaceVerts;
+  }
+
+  bool operator==(const TempPolygon &other) const {
+    return sortedFaceVerts == other.sortedFaceVerts;
+  }
+};
+
+NVGcolor lerpNVGColor(const NVGcolor &color1, const NVGcolor &color2,
+                      const NVGcolor &color3, float t) {
+  if (t < -1.0 || t > 1.0) {
+    throw std::out_of_range(
+        "Interpolation parameter must be between -1 and 1.");
+  }
+
+  NVGcolor result;
+  if (t < 0) {
+    return (nvgLerpRGBA(color1, color2, t + 1));
+  } else {
+    (nvgLerpRGBA(color2, color3, t - 1));
+  }
+  return result;
+}
+
 class AmmannBeeknerTileUI {
 public:
   AmmannBeeknerTileUI()
@@ -152,20 +201,71 @@ public:
                                                          // float value
         padding(mm2px(0.5)){};
   std::vector<Polygon> polygons;
+  std::map<std::vector<Vertex>,
+           std::map<std::vector<Vertex>, std::pair<float, float>>>
+      distanceMatrix;
 
-  std::set<Vertex> coordinatesOn;
-  TIP tipOn;
+  std::vector<Vertex> coordinatesOn;
   std::mutex coordinatesMutex;
   std::unordered_map<std::vector<Vertex>, size_t, VectorHash> polygonIDs;
 
   std::pair<float, float> minExtent;
   std::pair<float, float> maxExtent;
   float padding;
-  // royal blue  to pink
-  RGBLinearInterpolator eucInterp =
-      RGBLinearInterpolator(127.0 / 255, 216.0 / 255, 230.0 / 255, 255.0 / 255,
-                            192.0 / 255, 203.0 / 255);
 
+  const double pinkR = 255.0 / 255.0;
+  const double pinkG = 199.0 / 255.0;
+  const double pinkB = 229.0 / 255.0;
+
+  const double babyBlueR = 0 / 255.0;
+  const double babyBlueG = 174 / 255.0;
+  const double babyBlueB = 255 / 255.0;
+  const double cadGreenLightR = 135 / 255.0;
+  const double cadGreenLightG = 122 / 255.0;
+  const double cadGreenLightB = 0 / 255.0;
+  RGBLinearInterpolator eucInterp = RGBLinearInterpolator(
+      pinkR, pinkG, pinkB, 127.0 / 255, 216.0 / 255, 230.0 / 255);
+
+  const DualRGBLinearInterpolator phinterp = DualRGBLinearInterpolator(
+      cadGreenLightR, cadGreenLightG, cadGreenLightB, pinkR, pinkG, pinkB,
+      cadGreenLightR, cadGreenLightG, cadGreenLightB);
+
+  /**
+   * @brief Loads polygon data from a JSON file and ensures uniqueness of
+   * polygons based on the set of vertices in faceVerts, irrespective of their
+   * order.
+   *
+   * This function opens a JSON file specified by `filename` and parses it to
+   * construct a vector of `Polygon` objects. Each `Polygon` consists of 2D face
+   * vertices (`faceVerts`) and 4D vertex coordinates (`vertexCoords`). To
+   * ensure uniqueness based on `faceVerts` while preserving their original
+   * order, the function uses a temporary structure. This structure holds both
+   * the original `Polygon` and a sorted copy of its `faceVerts` for comparison
+   * purposes. After constructing this temporary vector, the function sorts it
+   * and removes duplicates based on the sorted `faceVerts`. Finally, the
+   * original `Polygon` objects, with their original order of `faceVerts`
+   * preserved, are extracted back.
+   *
+   * @note The uniqueness is determined based on the set of `faceVerts`,
+   * independent of their order in the Polygon. Two polygons with the same set
+   * of vertices in `faceVerts` but in different orders are considered the same
+   * for de-duplication.
+   *
+   * @param filename The path of the JSON file to be loaded.
+   *
+   * @exception json::parse_error Thrown if there is an error in parsing the
+   * JSON file.
+   * @exception std::exception Thrown for general exceptions like file not
+   * opening etc.
+   *
+   * Usage Example:
+   *
+   *     loadJSON("polygons.json");
+   *
+   * This will load polygons from `polygons.json`, ensuring that each unique set
+   * of `faceVerts` is represented only once in the resulting vector, regardless
+   * of the order of vertices in `faceVerts`.
+   */
   void loadJSON(const std::string &filename)
 
   {
@@ -215,26 +315,155 @@ public:
     } catch (const std::exception &e) {
       DEBUG("General error: %s", e.what());
     }
-    std::sort(polygons.begin(), polygons.end(),
-              [](const Polygon &a, const Polygon &b) {
-                if (a.faceVerts.size() != b.faceVerts.size())
-                  return a.faceVerts.size() < b.faceVerts.size();
-                for (size_t i = 0; i < a.faceVerts.size(); ++i) {
-                  if (a.faceVerts[i] != b.faceVerts[i])
-                    return a.faceVerts[i] < b.faceVerts[i];
-                }
-                return false; // They are equal
-              });
-    auto last = std::unique(polygons.begin(), polygons.end(),
-                            [](const Polygon &a, const Polygon &b) {
-                              return a.faceVerts == b.faceVerts;
-                            });
-    polygons.erase(last, polygons.end());
+    // Create a vector of TempPolygon from the original polygons
+    std::vector<TempPolygon> tempPolygons;
+    for (const auto &polygon : polygons) {
+      tempPolygons.emplace_back(polygon);
+    }
+
+    // Sort and remove duplicates in the temporary vector
+    std::sort(tempPolygons.begin(), tempPolygons.end());
+    auto last = std::unique(tempPolygons.begin(), tempPolygons.end());
+    tempPolygons.erase(last, tempPolygons.end());
+
+    // Extract the original Polygons back into the polygons vector
+    polygons.clear();
+    for (const auto &tempPoly : tempPolygons) {
+      polygons.push_back(tempPoly.originalPolygon);
+    }
   }
   size_t getPolygonsCount() const { return polygons.size(); }
 
-  void draw(Vec widgetSize, const std::map<Vertex, std::string> &labelMap,
-            std::map<std::vector<Vertex>, TIP> &tips, NVGcontext *vg)
+  void generateDistanceMap(std::map<std::vector<Vertex>, TIP> &tips) {
+    std::map<std::vector<Vertex>,
+             std::map<std::vector<Vertex>, std::pair<float, float>>>
+        distanceMap;
+    for (const auto &polyA : polygons) {
+      for (const auto &polyB : polygons) {
+
+        const TIP &tipA = tips[polyA.vertexCoords];
+        const TIP &tipB = tips[polyB.vertexCoords];
+        float euclideanD = tipA.euclideanDistanceTo(tipB);
+        float cosineD = 0.0;
+        try {
+          cosineD = tipA.cosineDistanceTo(tipB);
+        } catch (const std::exception &err) {
+          DEBUG("Error calculating cosine distance: %s", err.what());
+        }
+        distanceMap[polyA.vertexCoords][polyB.vertexCoords] =
+            std::make_pair(euclideanD, cosineD);
+      }
+    }
+    distanceMatrix = distanceMap;
+  };
+  void drawFilledPoly(NVGcontext *vg, const Polygon &poly, float xScale,
+                      float yScale, float xOffset, float yOffset) {
+
+    bool isClicked = false;
+    NVGcolor polyFillColor = nvgRGBf(1.0f, 1.0f, 1.0f);
+
+    // Check if the polygon is clicked
+    if (!poly.vertexCoords.empty() && !coordinatesOn.empty()) {
+      isClicked = std::all_of(poly.vertexCoords.begin(),
+                              poly.vertexCoords.end(), [this](const Vertex &v) {
+                                return std::find(coordinatesOn.begin(),
+                                                 coordinatesOn.end(),
+                                                 v) != coordinatesOn.end();
+                              });
+    }
+    if (!coordinatesOn.empty()) {
+
+      const float euclideanD =
+          std::get<0>(distanceMatrix[coordinatesOn][poly.vertexCoords]);
+      polyFillColor = convertToNVGColor(eucInterp.interpolate(euclideanD));
+    } else {
+      polyFillColor = nvgRGBA(255, 255, 255, 255);
+    }
+
+    const NVGcolor isClickedFillColor =
+        isClicked ? nvgRGBA(200, 200, 200, 255)
+                  : polyFillColor; // Grey if clicked, distance based chroma
+                                   // otherwise}
+
+    nvgSave(vg);
+
+    // Start drawing a path
+    nvgBeginPath(vg);
+    nvgLineJoin(vg, NVG_MITER);
+
+    bool firstVertex = true;
+
+    // Draw each vertex of the polygon
+    float x, y;
+    for (auto rit = poly.faceVerts.rbegin(); rit != poly.faceVerts.rend();
+         ++rit) {
+      const auto &vert = *rit;
+
+      x = xOffset + padding + vert.first * xScale;
+      y = yOffset + padding + vert.second * yScale;
+
+      if (firstVertex) {
+        nvgMoveTo(vg, x, y);
+        firstVertex = false;
+      } else {
+        nvgLineTo(vg, x, y);
+      }
+    }
+
+    nvgClosePath(vg);
+    nvgFillColor(vg, isClickedFillColor);
+
+    nvgFill(vg);
+
+    nvgRestore(vg);
+  }
+  void drawStrokedPoly(NVGcontext *vg, const Polygon &poly, float xScale,
+                       float yScale, float xOffset, float yOffset) {
+    NVGcolor phaseFillColor = nvgRGB(255, 255, 255);
+
+    if (!coordinatesOn.empty()) {
+
+      const float cosineD =
+          std::get<1>(distanceMatrix[poly.vertexCoords][coordinatesOn]);
+
+      phaseFillColor = convertToNVGColor(phinterp.interpolate(cosineD));
+    } else {
+      phaseFillColor = nvgRGBA(200, 200, 200, 255);
+    }
+
+    nvgSave(vg);
+    // Start drawing a path
+    nvgBeginPath(vg);
+
+    nvgStrokeWidth(vg, 2.0);
+    nvgLineJoin(vg, NVG_MITER);
+
+    bool firstVertex = true;
+    float x, y;
+
+    for (auto rit = poly.faceVerts.rbegin(); rit != poly.faceVerts.rend();
+         ++rit) {
+      const auto &vert = *rit;
+      x = xOffset + padding + vert.first * xScale;
+      y = yOffset + padding + vert.second * yScale;
+
+      if (firstVertex) {
+        nvgMoveTo(vg, x, y);
+        firstVertex = false;
+      } else {
+        nvgLineTo(vg, x, y);
+      }
+    }
+    nvgClosePath(vg);
+    nvgStrokeColor(vg, phaseFillColor);
+    nvgStroke(vg);
+    nvgScale(vg, 0.95, 0.95);
+
+    nvgRestore(vg);
+  }
+
+  void draw(const Vec widgetSize, std::map<Vertex, std::string> &labelMap,
+            NVGcontext *vg)
 
   {
     // Check if NanoVG context is valid
@@ -242,128 +471,29 @@ public:
       std::cerr << "NanoVG context is not initialized." << std::endl;
       return;
     }
-    nvgSave(vg);
 
     // Determine x, y scaling for the drawing
-    float xScale =
+    const float xScale =
         (widgetSize.x - padding) / (maxExtent.first - minExtent.first);
-    float yScale =
+    const float yScale =
         (widgetSize.y - padding) / (maxExtent.second - minExtent.second);
 
-    float xOffset = widgetSize.x / 2;
-    float yOffset = widgetSize.y / 2;
-    std::map<Polygon, NVGcolor> fillColors;
-    {
-      std::lock_guard<std::mutex> guard(coordinatesMutex);
-      for (const auto &poly : polygons) {
+    const float xOffset = widgetSize.x / 2;
+    const float yOffset = widgetSize.y / 2;
 
-        bool isClicked = false;
-        NVGcolor polyFillColor = nvgRGBf(1.0f, 1.0f, 1.0f);
-
-        // Check if the polygon is clicked
-        if (!poly.vertexCoords.empty() && !coordinatesOn.empty()) {
-          isClicked = std::all_of(
-              poly.vertexCoords.begin(), poly.vertexCoords.end(),
-              [this](const Vertex &v) {
-                return std::find(coordinatesOn.begin(), coordinatesOn.end(),
-                                 v) != coordinatesOn.end();
-              });
-        }
-        if (!coordinatesOn.empty()) {
-          const TIP thisTip = tips[poly.vertexCoords];
-          const float euclideanD = thisTip.euclideanDistanceTo(tipOn);
-          // These logs indicate that there are various values of euclideanD in
-          // the loop.
-          // DEBUG("Euclidean distance: %f", euclideanD);
-          RGBLinearInterpolator bginterp =
-              RGBLinearInterpolator(0.9f, 1.0f, 0.9f, 0.0f, 0.0f, 0.9f);
-          const std::tuple<float, float, float> rgbf =
-              bginterp.interpolate(euclideanD);
-          polyFillColor =
-              nvgRGBf(std::get<0>(rgbf), std::get<1>(rgbf), std::get<2>(rgbf));
-          // NVGcolor nearlyWhiteGreen = nvgRGBf(0.9f, 1.0f, 0.9f);
-          // NVGcolor deepBlue = nvgRGBf(0.0f, 0.0f, 0.9f);
-          // polyFillColor = nvgLerpRGBA(deepBlue, nearlyWhiteGreen,
-          // euclideanD);
-        } else {
-          polyFillColor = nvgRGBA(255, 255, 255, 255);
-        }
-        const NVGcolor isClickedFillColor =
-            isClicked ? nvgRGBA(200, 200, 200, 255)
-                      : polyFillColor; // Grey if clicked, distance based chroma
-                                       // otherwise}
-        fillColors[poly] = isClickedFillColor;
-      }
-    }
-
-    std::set<Vertex> seenVertices;
     // Iterate over each polygon
-    for (const auto &poly : polygons) {
-      const NVGcolor fillColor = fillColors[poly];
-      nvgSave(vg);
 
-      // Start drawing a path
-      nvgBeginPath(vg);
-      nvgLineJoin(vg, NVG_MITER);
+    for (const Polygon &poly : polygons) {
 
-      bool firstVertex = true;
-
-      // Draw each vertex of the polygon
-      float x, y;
-      for (const auto &vert : poly.faceVerts) {
-
-        x = xOffset + padding + vert.first * xScale;
-        y = yOffset + padding + vert.second * yScale;
-
-        if (firstVertex) {
-          nvgMoveTo(vg, x, y);
-          firstVertex = false;
-        } else {
-          nvgLineTo(vg, x, y);
-        }
-      }
-
-      // Close the path and fill
-      // These logs indicate there are more than one color being accessed
-      // accross the loop by fillColors[poly]
-      // DEBUG("filling color: %s", nvcolor_to_string(fillColor).c_str());
-
-      nvgFillColor(vg, fillColor);
-      nvgClosePath(vg);
-      nvgFill(vg);
-
-      nvgRestore(vg);
-      nvgSave(vg);
-      // Start drawing a path
-      nvgBeginPath(vg);
-
-      nvgStrokeColor(vg, nvgRGBf(0.88, 0.88, 0.88));
-      nvgStrokeWidth(vg, 1.0);
-      nvgLineJoin(vg, NVG_MITER);
-
-      firstVertex = true;
-
-      for (const auto &vert : poly.faceVerts) {
-        x = xOffset + padding + vert.first * xScale;
-        y = yOffset + padding + vert.second * yScale;
-
-        if (firstVertex) {
-          nvgMoveTo(vg, x, y);
-          firstVertex = false;
-        } else {
-          nvgLineTo(vg, x, y);
-        }
-      }
-      nvgClosePath(vg);
-      nvgStroke(vg);
-
-      nvgRestore(vg);
+      drawFilledPoly(vg, poly, xScale, yScale, xOffset, yOffset);
+      drawStrokedPoly(vg, poly, xScale, yScale, xOffset, yOffset);
     }
     // draw labels for each vertex
     float r = 7;
 
-    for (const auto &poly : polygons) {
-      const NVGcolor fillColor = fillColors[poly];
+    std::set<Vertex> seenVertices;
+    for (const Polygon &poly : polygons) {
+
       for (size_t i = 0; i < poly.vertexCoords.size(); i++) {
 
         const Vertex &vertex = poly.vertexCoords[i];
@@ -374,7 +504,7 @@ public:
             seenVertices.find(vertex) == seenVertices.end()) {
           float x = xOffset + padding + face.first * xScale;
           float y = yOffset + padding + face.second * yScale;
-
+          nvgSave(vg);
           // Draw a small white circle with grey stroke
           nvgBeginPath(vg);
           nvgStrokeColor(vg, nvgRGBf(0.88, 0.88, 0.88));
@@ -386,33 +516,10 @@ public:
           nvgStroke(vg);
           centerRuledLabel(vg, x - (r / 2), y, r, it->second.c_str(), 11);
           seenVertices.insert(vertex);
-          // Calculate the center of the polygon to place the label
-          float labelX = 0.0f;
-          float labelY = 0.0f;
-          float r = 10;
-          int vertexCount = 0;
-          for (const auto &vert : poly.faceVerts) {
-            labelX += xOffset + padding + vert.first * xScale;
-            labelY += yOffset + padding + vert.second * yScale;
-            vertexCount++;
-          }
-          labelX /= vertexCount;
-          labelY /= vertexCount;
-
-          // Set the label with the color string
-          // std::string colorLabel = nvcolor_to_string(fillColor);
-          // centerRuledLabel(vg, labelX - (r / 2), labelY, r,
-          //                  colorLabel.c_str(), 11);
-          nvgBeginPath(vg);
-          float hw = 16;
-          nvgRect(vg, labelX - (0.5 * hw), labelY - (0.5 * hw), hw, hw);
-          nvgFillColor(vg, fillColor); // This rectangle will be filled with the
-                                       // correct color.
-          nvgFill(vg);
+          nvgRestore(vg);
         }
       }
     }
-    nvgRestore(vg);
   }
 
   // Method to add polygons' coordinates to coordinatesOn if intersected by
@@ -434,9 +541,9 @@ public:
 
       if (isInsidePolygon(point, poly.faceVerts)) {
 
-        std::set<Vertex> coordinatesOn_update;
+        std::vector<Vertex> coordinatesOn_update;
         for (const auto &vertex : poly.vertexCoords) {
-          coordinatesOn_update.insert(vertex);
+          coordinatesOn_update.push_back(vertex);
         }
         // TODO: need mutex guard here
         if (coordinatesOn != coordinatesOn_update) {
@@ -447,9 +554,7 @@ public:
             pitches.insert(ZZ_12(abs(pitch)));
           }
           std::vector<ZZ_12> pitchesVector(pitches.begin(), pitches.end());
-          TIP tipOn_ = tk6(pitchesVector);
           std::lock_guard<std::mutex> guard(coordinatesMutex);
-          tipOn = tipOn_;
           coordinatesOn = coordinatesOn_update;
         }
       }
@@ -567,6 +672,7 @@ struct TileUIWidget : OpaqueWidget {
       TIP tip = tk6(pitchVector);
       tips[poly.vertexCoords] = tip;
     }
+    tileUI.generateDistanceMap(tips);
   }
 
   void setBaseOctave(const int base) {
@@ -584,7 +690,7 @@ struct TileUIWidget : OpaqueWidget {
   void draw(const DrawArgs &args) override {
 
     Vec widgetSize = {box.size.x, box.size.y};
-    tileUI.draw(widgetSize, labelMap, tips, args.vg);
+    tileUI.draw(widgetSize, labelMap, args.vg);
   }
   void onButton(const event::Button &e) override {
     if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -652,7 +758,7 @@ struct AmB_Tonnetz : Module {
       std::lock_guard<std::mutex> guard(tileUIWidget->tileUI.coordinatesMutex);
       if (!tileUIWidget->tileUI.coordinatesOn.empty()) {
 
-        std::set<Vertex> localCoords = tileUIWidget->tileUI.coordinatesOn;
+        std::vector<Vertex> localCoords = tileUIWidget->tileUI.coordinatesOn;
         for (auto &coord : localCoords) {
 
           currentMidiNotes.push_back(
@@ -765,9 +871,17 @@ struct ChordNameUIWidget : OpaqueWidget {
         }
 
         centerRuledLabel(args.vg, 0, 0, 12, chordName.c_str(), 24);
+        centerRuledLabel(args.vg, 0, 36, 12,
+                         to_mode_string(tileUIWidget->mode).c_str(), 18);
+        centerRuledLabel(args.vg, 0, 64, 12,
+                         toStringVertex(tileUIWidget->intervals).c_str(), 18);
       } catch (const std::exception &e) {
         std::string errorMessage = e.what();
-        centerRuledLabel(args.vg, 0, 0, 12, errorMessage.c_str(), 12);
+        centerRuledLabel(args.vg, 0, 0, 12, errorMessage.c_str(), 18);
+        centerRuledLabel(args.vg, 0, 36, 12,
+                         to_mode_string(tileUIWidget->mode).c_str(), 18);
+        centerRuledLabel(args.vg, 0, 64, 12,
+                         toStringVertex(tileUIWidget->intervals).c_str(), 18);
       }
     }
   }

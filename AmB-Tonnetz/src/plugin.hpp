@@ -6,5 +6,6 @@ extern Plugin *pluginInstance;
 
 extern Model *modelAmB_Tonnetz;
 
+extern Model *modelBaconTest;
 // Declare each Model, defined in each module source file
 // extern Model* modelMyModule;

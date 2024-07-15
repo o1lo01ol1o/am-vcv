@@ -23,6 +23,12 @@ std::string toStringHeptatonicScale(const HeptatonicScale &scale) {
   return result;
 }
 
+std::string to_mode_string(const ZZ_7 &mode) {
+  static const std::vector<std::string> romanNumerals = {"I", "II", "III", "IV",
+                                                         "V", "VI", "VII"};
+  return romanNumerals.at(mode.unMod());
+}
+
 // Define the scales as global constants
 // Define constants for each mode
 const HeptatonicScale cIonian = {ZZ_12(0), ZZ_12(2), ZZ_12(4), ZZ_12(5),

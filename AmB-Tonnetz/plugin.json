@@ -18,6 +18,12 @@
       "name": "AmB-Tonnetz",
       "description": "",
       "tags": []
+    },
+    {
+      "slug": "BaconTest",
+      "name": "BaconTest",
+      "description": "BaconPaul's Test Widgets",
+      "tags": []
     }
   ]
 }

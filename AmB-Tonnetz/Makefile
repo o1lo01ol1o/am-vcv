@@ -6,7 +6,7 @@ FLAGS += ${DEVENV_FLAGS}
 
 # CFLAGS +=
 # CXXFLAGS +=
-
+CXXFLAGS = -std=c++17 -Wall -Wextra 
 # Careful about linking to shared libraries, since you can't assume much about the user's environment and library search path.
 # Static libraries are fine, but they should be added to this plugin's build system.
 # TODO: gotta somehow get open cv included or built statically. we only use cv::Mat though . . .
@@ -15,6 +15,7 @@ LDFLAGS += ${DEVENV_OPENCV_FLAGS}
 
 # Add .cpp files to the build
 SOURCES += $(wildcard src/*.cpp)
+
 
 # Add files to the ZIP package when running `make dist`
 # The compiled plugin and "plugin.json" are automatically added.
@@ -32,7 +33,8 @@ TEST_BINARY := testBin  # Name of the test binary
 
 # Test suite target
 test: FLAGS += $(TEST_FLAGS) 
-test: CXXFLAGS += -Wl,-rpath,/Users/timpierson/arity/am-vcv/sdk/Rack-SDK -L/Users/timpierson/arity/am-vcv/sdk/Rack-SDK -lRack -undefined dynamic_lookup -stdlib=libc++ -mmacosx-version-min=10.9 ${DEVENV_FLAGS}
+# may need to clear the std flag above
+test: CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer -g -O1 -Wl,-rpath,/Users/timpierson/arity/am-vcv/sdk/Rack-SDK -L/Users/timpierson/arity/am-vcv/sdk/Rack-SDK -lRack -undefined dynamic_lookup -stdlib=libc++ -mmacosx-version-min=10.9 ${DEVENV_FLAGS}
 # test: LDFLAGS += 
 test: $(TEST_SOURCES)
 	$(CXX) $(FLAGS) $(CXXFLAGS) -o $(TEST_BINARY) $(TEST_SOURCES)
