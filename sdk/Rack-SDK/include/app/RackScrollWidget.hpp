@@ -29,6 +29,10 @@ struct RackScrollWidget : ui::ScrollWidget {
 	*/
 	void setZoom(float zoom);
 	void setZoom(float zoom, math::Vec pivot);
+	/** Sets offset and zoom to fit module bounding box to view. */
+	void zoomToModules();
+	/** Sets offset and zoom to fit given bound (in module coordinates) to view. */
+	void zoomToBound(math::Rect bound);
 
 	void step() override;
 	void draw(const DrawArgs& args) override;

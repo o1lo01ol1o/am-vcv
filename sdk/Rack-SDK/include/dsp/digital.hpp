@@ -172,13 +172,17 @@ struct PulseGenerator {
 		remaining = 0.f;
 	}
 
-	/** Advances the state by `deltaTime`. Returns whether the pulse is in the HIGH state. */
+	/** Advances the state by `deltaTime`. Returns whether the pulse was in the HIGH state before stepping. */
 	bool process(float deltaTime) {
 		if (remaining > 0.f) {
 			remaining -= deltaTime;
 			return true;
 		}
 		return false;
+	}
+
+	bool isHigh() {
+		return (remaining > 0.f);
 	}
 
 	/** Begins a trigger with the given `duration`. */

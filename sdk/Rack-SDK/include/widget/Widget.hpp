@@ -286,6 +286,12 @@ struct Widget : WeakBase {
 		See GLFW_MOD_* for the list of possible values.
 		*/
 		int mods;
+		/** Checks whether this KeyBaseEvent is the given key command. `mods` is OR'd GLFW modifier keys.
+		On Latin keyboards such as QWERTY, AZERTY, QWERTZ, and Dvorak, the key name is checked regardless of position. For example, pressing Q with key=GLFW_KEY_Q returns true for all of these layouts.
+		On non-Latin keyboards such as JCUKEN (ЙЦУКЕН), the layout is assumed to match QWERTY. For example, pressing Й with key=GLFW_KEY_Q returns true.
+		Implemented in event.cpp.
+		*/
+		bool isKeyCommand(int key, int mods = 0) const;
 	};
 
 	/** Occurs when a key is pressed, released, or repeated while the mouse is hovering a Widget.
@@ -299,7 +305,7 @@ struct Widget : WeakBase {
 	/** An event prototype with a Unicode character. */
 	struct TextBaseEvent {
 		/** Unicode code point of the character */
-		int codepoint;
+		uint32_t codepoint;
 	};
 	/** Occurs when a character is typed while the mouse is hovering a Widget.
 	Recurses.

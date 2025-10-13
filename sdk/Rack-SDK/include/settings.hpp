@@ -24,9 +24,13 @@ extern std::string settingsPath;
 extern bool devMode;
 extern bool headless;
 extern bool isPlugin;
+/** Requests to restart the application on exit. */
+extern bool restart;
 
 // Persistent state, serialized to settings.json.
 
+/** ISO 639-1 language code for string translations. */
+extern std::string language;
 /** Launches Rack without loading plugins or the autosave patch. Always set to false when settings are saved. */
 extern bool safeMode;
 /** vcvrack.com user token */
@@ -39,6 +43,8 @@ extern math::Vec windowSize;
 extern math::Vec windowPos;
 /** Reverse the zoom scroll direction */
 extern bool invertZoom;
+/** Mouse wheel zooms instead of pans. */
+extern bool mouseWheelZoom;
 /** Ratio between UI pixel and physical screen pixel.
 0 for auto.
 */
@@ -75,9 +81,14 @@ extern float frameRateLimit;
 /** Interval between autosaves in seconds. */
 extern float autosaveInterval;
 extern bool skipLoadOnLaunch;
+extern std::string lastPatchDirectory;
+extern std::string lastSelectionDirectory;
 extern std::list<std::string> recentPatchPaths;
 extern std::vector<NVGcolor> cableColors;
+extern std::vector<std::string> cableLabels;
+extern bool cableAutoRotate;
 extern bool autoCheckUpdates;
+extern bool verifyHttpsCerts;
 extern bool showTipsOnLaunch;
 extern int tipIndex;
 enum BrowserSort {
@@ -116,6 +127,7 @@ struct PluginWhitelist {
 extern std::map<std::string, PluginWhitelist> moduleWhitelist;
 
 bool isModuleWhitelisted(const std::string& pluginSlug, const std::string& moduleSlug);
+void resetCables();
 
 PRIVATE void init();
 PRIVATE void destroy();

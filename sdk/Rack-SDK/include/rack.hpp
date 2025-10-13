@@ -103,8 +103,7 @@ Directly including Rack headers other than rack.hpp in your plugin is unsupporte
 #include <engine/Module.hpp>
 #include <engine/Engine.hpp>
 
-#include <plugin/Plugin.hpp>
-#include <plugin/Model.hpp>
+#include <plugin.hpp>
 #include <plugin/callbacks.hpp>
 
 #include <dsp/common.hpp>

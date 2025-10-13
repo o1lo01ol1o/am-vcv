@@ -193,7 +193,9 @@ struct Port {
 		return channels > 1;
 	}
 
-	/** Use getNormalVoltage() instead. */
+	/** Use getNormalVoltage() instead.
+	"Normal" voltage is the correct term, not "normalized" voltage.
+	*/
 	DEPRECATED float normalize(float normalVoltage) {
 		return getNormalVoltage(normalVoltage);
 	}

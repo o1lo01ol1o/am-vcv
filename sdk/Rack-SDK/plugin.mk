@@ -33,20 +33,21 @@ ifdef ARCH_LIN
 	LDFLAGS += -Wl,-rpath=/tmp/Rack2
 	# Since the plugin's compiler could be a different version than Rack's compiler, link libstdc++ and libgcc statically to avoid ABI issues.
 	LDFLAGS += -static-libstdc++ -static-libgcc
-	RACK_USER_DIR ?= $(HOME)/.Rack2
+	XDG_DATA_HOME ?= $(HOME)/.local/share
+	RACK_USER_DIR ?= $(XDG_DATA_HOME)/Rack2
 endif
 
 ifdef ARCH_MAC
 	TARGET := $(TARGET).dylib
 	LDFLAGS += -undefined dynamic_lookup
-	RACK_USER_DIR ?= $(HOME)/Documents/Rack2
+	RACK_USER_DIR ?= $(HOME)/Library/Application Support/Rack2
 	CODESIGN ?= codesign -f -s -
 endif
 
 ifdef ARCH_WIN
 	TARGET := $(TARGET).dll
 	LDFLAGS += -static-libstdc++
-	RACK_USER_DIR ?= $(USERPROFILE)/Documents/Rack2
+	RACK_USER_DIR ?= $(LOCALAPPDATA)/Rack2
 endif
 
 PLUGINS_DIR := $(RACK_USER_DIR)/plugins-$(ARCH_OS)-$(ARCH_CPU)
@@ -61,6 +62,9 @@ include $(RACK_DIR)/compile.mk
 
 clean:
 	rm -rfv build $(TARGET) dist
+
+cleandist:
+	rm -rfv dist
 
 ZSTD_COMPRESSION_LEVEL ?= 19
 
@@ -86,8 +90,9 @@ ifdef ARCH_MAC
 else
 	cp -r --parents $(DISTRIBUTABLES) dist/$(SLUG)/
 endif
-	@# Create ZIP package
-	cd dist && tar -c $(SLUG) | zstd -$(ZSTD_COMPRESSION_LEVEL) -o "$(SLUG)"-"$(VERSION)"-$(ARCH_NAME).vcvplugin
+	@# Archive plugin dir with Zstandard + tar
+	@# Don't store extended attributes with --no-xattrs
+	cd dist && tar --no-xattrs -c $(SLUG) | zstd -$(ZSTD_COMPRESSION_LEVEL) -o "$(SLUG)"-"$(VERSION)"-$(ARCH_NAME).vcvplugin
 
 install: dist
 	mkdir -p "$(PLUGINS_DIR)"

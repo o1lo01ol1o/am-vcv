@@ -39,6 +39,7 @@ std::string plugin(plugin::Plugin* plugin, std::string filename = "");
 // Set these before calling init() to override the default paths
 extern std::string systemDir;
 extern std::string userDir;
+extern std::string oldUserDir;
 // Only defined on Mac
 extern std::string bundlePath;
 

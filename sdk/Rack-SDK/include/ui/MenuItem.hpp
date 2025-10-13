@@ -15,6 +15,7 @@ struct MenuItem : MenuEntry {
 	bool disabled = false;
 
 	void draw(const DrawArgs& args) override;
+	PRIVATE void drawOffset(NVGcontext* vg, float offset = 0);
 	void step() override;
 	void onEnter(const EnterEvent& e) override;
 	void onDragDrop(const DragDropEvent& e) override;
@@ -27,6 +28,14 @@ struct MenuItem : MenuEntry {
 	If Ctrl (Cmd on Mac) is held, the event is *not* pre-consumed, so if your menu must be closed, always consume the event.
 	*/
 	void onAction(const ActionEvent& e) override;
+};
+
+
+struct ColorDotMenuItem : MenuItem {
+	NVGcolor color = color::BLACK_TRANSPARENT;
+
+	void draw(const DrawArgs& args) override;
+	void step() override;
 };
 
 

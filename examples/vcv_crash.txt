@@ -1,0 +1,1118 @@
+-------------------------------------
+Translated Report (Full Report Below)
+-------------------------------------
+
+Process:               Rack [46377]
+Path:                  /Applications/VCV Rack 2 Free.app/Contents/MacOS/Rack
+Identifier:            com.vcvrack.rack2
+Version:               2.6.4 (2.6.4)
+Code Type:             ARM-64 (Native)
+Parent Process:        launchd [1]
+User ID:               501
+
+Date/Time:             2025-10-13 20:44:26.9394 +0100
+OS Version:            macOS 14.1 (23B74)
+Report Version:        12
+Anonymous UUID:        4B92930B-B1D9-94DB-EC02-1E820687FE84
+
+Sleep/Wake UUID:       02D80A26-81A2-42BC-A097-639417363A40
+
+Time Awake Since Boot: 5700000 seconds
+Time Since Wake:       283214 seconds
+
+System Integrity Protection: enabled
+
+Crashed Thread:        0  Dispatch queue: com.apple.main-thread
+
+Exception Type:        EXC_BAD_ACCESS (SIGSEGV)
+Exception Codes:       KERN_INVALID_ADDRESS at 0x0000000000000000
+Exception Codes:       0x0000000000000001, 0x0000000000000000
+
+VM Region Info: 0 is not in any region.  Bytes before following region: 4332716032
+      REGION TYPE                    START - END         [ VSIZE] PRT/MAX SHRMOD  REGION DETAIL
+      UNUSED SPACE AT START
+--->  
+      __TEXT                      102400000-102404000    [   16K] r-x/r-x SM=COW  ...ts/MacOS/Rack
+
+Thread 0 Crashed::  Dispatch queue: com.apple.main-thread
+0   ???                           	               0x0 ???
+1   libc++.1.0.dylib              	       0x10c0fd41c std::__1::DoIOSInit::DoIOSInit() + 148
+2   libc++.1.0.dylib              	       0x10c0fe9d4 _GLOBAL__I_000100 + 72
+3   dyld                          	       0x18f5c9a24 invocation function for block in dyld4::Loader::findAndRunAllInitializers(dyld4::RuntimeState&) const::$_0::operator()() const + 168
+4   dyld                          	       0x18f60f0f4 invocation function for block in dyld3::MachOAnalyzer::forEachInitializer(Diagnostics&, dyld3::MachOAnalyzer::VMAddrConverter const&, void (unsigned int) block_pointer, void const*) const + 172
+5   dyld                          	       0x18f602668 invocation function for block in dyld3::MachOFile::forEachSection(void (dyld3::MachOFile::SectionInfo const&, bool, bool&) block_pointer) const + 496
+6   dyld                          	       0x18f5a92fc dyld3::MachOFile::forEachLoadCommand(Diagnostics&, void (load_command const*, bool&) block_pointer) const + 300
+7   dyld                          	       0x18f6016a0 dyld3::MachOFile::forEachSection(void (dyld3::MachOFile::SectionInfo const&, bool, bool&) block_pointer) const + 192
+8   dyld                          	       0x18f604188 dyld3::MachOFile::forEachInitializerPointerSection(Diagnostics&, void (unsigned int, unsigned int, bool&) block_pointer) const + 160
+9   dyld                          	       0x18f60ede8 dyld3::MachOAnalyzer::forEachInitializer(Diagnostics&, dyld3::MachOAnalyzer::VMAddrConverter const&, void (unsigned int) block_pointer, void const*) const + 432
+10  dyld                          	       0x18f5c5b38 dyld4::Loader::findAndRunAllInitializers(dyld4::RuntimeState&) const + 524
+11  dyld                          	       0x18f5cbf70 dyld4::JustInTimeLoader::runInitializers(dyld4::RuntimeState&) const + 36
+12  dyld                          	       0x18f5c5f24 dyld4::Loader::runInitializersBottomUp(dyld4::RuntimeState&, dyld3::Array<dyld4::Loader const*>&) const + 220
+13  dyld                          	       0x18f5c5f00 dyld4::Loader::runInitializersBottomUp(dyld4::RuntimeState&, dyld3::Array<dyld4::Loader const*>&) const + 184
+14  dyld                          	       0x18f5c5f00 dyld4::Loader::runInitializersBottomUp(dyld4::RuntimeState&, dyld3::Array<dyld4::Loader const*>&) const + 184
+15  dyld                          	       0x18f5c9ab0 dyld4::Loader::runInitializersBottomUpPlusUpwardLinks(dyld4::RuntimeState&) const::$_1::operator()() const + 112
+16  dyld                          	       0x18f5c60f0 dyld4::Loader::runInitializersBottomUpPlusUpwardLinks(dyld4::RuntimeState&) const + 380
+17  dyld                          	       0x18f5e47ac dyld4::APIs::dlopen_from(char const*, int, void*) + 1576
+18  libRack.dylib                 	       0x10413f3ac rack::plugin::loadPlugin(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>) + 932
+19  libRack.dylib                 	       0x10413e660 rack::plugin::init() + 1776
+20  Rack                          	       0x102401fb8 main + 2876
+21  dyld                          	       0x18f5ad0e0 start + 2360
+
+Thread 1:
+0   libsystem_pthread.dylib       	       0x18f923e28 start_wqthread + 0
+
+Thread 2:
+0   libsystem_pthread.dylib       	       0x18f923e28 start_wqthread + 0
+
+Thread 3:
+0   libsystem_pthread.dylib       	       0x18f923e28 start_wqthread + 0
+
+Thread 4:: caulk.messenger.shared:17
+0   libsystem_kernel.dylib        	       0x18f8e8830 semaphore_wait_trap + 8
+1   caulk                         	       0x199c7a690 caulk::semaphore::timed_wait(double) + 212
+2   caulk                         	       0x199c7a544 caulk::concurrent::details::worker_thread::run() + 36
+3   caulk                         	       0x199c7a244 void* caulk::thread_proxy<std::__1::tuple<caulk::thread::attributes, void (caulk::concurrent::details::worker_thread::*)(), std::__1::tuple<caulk::concurrent::details::worker_thread*>>>(void*) + 96
+4   libsystem_pthread.dylib       	       0x18f929034 _pthread_start + 136
+5   libsystem_pthread.dylib       	       0x18f923e3c thread_start + 8
+
+Thread 5:: caulk.messenger.shared:high
+0   libsystem_kernel.dylib        	       0x18f8e8830 semaphore_wait_trap + 8
+1   caulk                         	       0x199c7a690 caulk::semaphore::timed_wait(double) + 212
+2   caulk                         	       0x199c7a544 caulk::concurrent::details::worker_thread::run() + 36
+3   caulk                         	       0x199c7a244 void* caulk::thread_proxy<std::__1::tuple<caulk::thread::attributes, void (caulk::concurrent::details::worker_thread::*)(), std::__1::tuple<caulk::concurrent::details::worker_thread*>>>(void*) + 96
+4   libsystem_pthread.dylib       	       0x18f929034 _pthread_start + 136
+5   libsystem_pthread.dylib       	       0x18f923e3c thread_start + 8
+
+Thread 6:
+0   libsystem_kernel.dylib        	       0x18f8e88b4 mach_msg2_trap + 8
+1   libsystem_kernel.dylib        	       0x18f8fad30 mach_msg2_internal + 80
+2   libsystem_kernel.dylib        	       0x18f8f14f0 mach_msg_overwrite + 476
+3   libsystem_kernel.dylib        	       0x18f8e8c38 mach_msg + 24
+4   CoreMIDI                      	       0x1a941648c XServerMachPort::ReceiveMessage(int&, void*, int&) + 104
+5   CoreMIDI                      	       0x1a942766c MIDIProcess::MIDIInPortThread::Run() + 156
+6   CoreMIDI                      	       0x1a9424a64 CADeprecated::XThread::RunHelper(void*) + 48
+7   CoreMIDI                      	       0x1a94266c0 CADeprecated::CAPThread::Entry(CADeprecated::CAPThread*) + 92
+8   libsystem_pthread.dylib       	       0x18f929034 _pthread_start + 136
+9   libsystem_pthread.dylib       	       0x18f923e3c thread_start + 8
+
+Thread 7:
+0   libsystem_kernel.dylib        	       0x18f8f3a14 __select + 8
+1   libRack.dylib                 	       0x104299710 Curl_poll + 576
+2   libRack.dylib                 	       0x104293830 multi_wait + 444
+3   libRack.dylib                 	       0x1042814e4 curl_easy_perform + 412
+4   libRack.dylib                 	       0x104139830 rack::network::requestDownload(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, float*, std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>>> const&) + 364
+5   plugin.dylib                  	       0x109e1fea0 rack::drm::Context::download() + 876
+6   plugin.dylib                  	       0x109e20310 void* std::__1::__thread_proxy[abi:v15006]<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct>>, void (*)(void*), void*>>(void*) + 44
+7   libsystem_pthread.dylib       	       0x18f929034 _pthread_start + 136
+8   libsystem_pthread.dylib       	       0x18f923e3c thread_start + 8
+
+Thread 8:
+0   libsystem_kernel.dylib        	       0x18f8ea66c __ulock_wait + 8
+1   libsystem_platform.dylib      	       0x18f95570c _os_unfair_lock_lock_slow + 208
+2   dyld                          	       0x18f5e42fc dyld4::APIs::dlopen_from(char const*, int, void*) + 376
+3   Network                       	       0x1970e2f1c __nw_protocol_get_tcp_image_block_invoke + 60
+4   libdispatch.dylib             	       0x18f77b910 _dispatch_client_callout + 20
+5   libdispatch.dylib             	       0x18f77d14c _dispatch_once_callout + 32
+6   Network                       	       0x1970e3504 __nw_protocol_get_tcp_identifier_block_invoke + 688
+7   libdispatch.dylib             	       0x18f77b910 _dispatch_client_callout + 20
+8   libdispatch.dylib             	       0x18f77d14c _dispatch_once_callout + 32
+9   Network                       	       0x1970e3698 __nw_protocol_setup_tcp_definition_block_invoke + 312
+10  libdispatch.dylib             	       0x18f77b910 _dispatch_client_callout + 20
+11  libdispatch.dylib             	       0x18f77d14c _dispatch_once_callout + 32
+12  Network                       	       0x196c8c458 nw_parameters_create_legacy_tcp_socket + 1948
+13  Network                       	       0x197151058 nw_path_libinfo_path_check + 260
+14  libsystem_info.dylib          	       0x18f960878 si_addrinfo + 544
+15  libsystem_info.dylib          	       0x18f9605b0 getaddrinfo + 168
+16  libRack.dylib                 	       0x10427c72c Curl_getaddrinfo_ex + 48
+17  libRack.dylib                 	       0x10426c2f4 getaddrinfo_thread + 92
+18  libRack.dylib                 	       0x10427d0f4 curl_thread_create_thunk + 40
+19  libsystem_pthread.dylib       	       0x18f929034 _pthread_start + 136
+20  libsystem_pthread.dylib       	       0x18f923e3c thread_start + 8
+
+
+Thread 0 crashed with ARM Thread State (64-bit):
+    x0: 0x00000001077ee908   x1: 0x000000016d9fd7cc   x2: 0x0000000000000000   x3: 0x000000016d9ffba0
+    x4: 0x00000001e5f7c5e0   x5: 0x0000000000000000   x6: 0x0000000000000000   x7: 0x0000000000000000
+    x8: 0x0000000000000000   x9: 0xd48c6cbb3e1c0017  x10: 0x00000000000000f0  x11: 0x0000000000000002
+   x12: 0x0000000000000000  x13: 0x0000000000000000  x14: 0x0000000000000002  x15: 0x00007074754f6174
+   x16: 0x000000018f923f24  x17: 0x000000018f923854  x18: 0x0000000000000000  x19: 0x000000010c179f48
+   x20: 0x000000010c179f48  x21: 0x0000000102819b90  x22: 0x00000001e4972fe8  x23: 0x000000010c0c8420
+   x24: 0x000000010c179db8  x25: 0x000000010c0c8808  x26: 0x000000016d9fdbb0  x27: 0x000000010c0c8420
+   x28: 0x7ffffffffffffff7   fp: 0x000000016d9fd8b0   lr: 0x000000010c0fdbb8
+    sp: 0x000000016d9fd8a0   pc: 0x0000000000000000 cpsr: 0x60001000
+   far: 0x0000000000000000  esr: 0x56000080  Address size fault
+
+Binary Images:
+       0x10bfcc000 -        0x10c073fff plugin.dylib (*) <8aa51f46-8e6e-32e0-a273-40d84f30e4a1> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x10c36c000 -        0x10c583fff libopencv_core.3.4.18.dylib (*) <5246d993-288b-33f5-86d4-c64ad236bbad> /Volumes/VOLUME/*/libopencv_core.3.4.18.dylib
+       0x10c938000 -        0x10cba3fff libopencv_imgproc.3.4.18.dylib (*) <4908d154-e8cd-30d2-ba48-47aaf931f8b4> /Volumes/VOLUME/*/libopencv_imgproc.3.4.18.dylib
+       0x103ea0000 -        0x103eaffff libopencv_highgui.3.4.18.dylib (*) <7ea1ad1c-67d8-3f0d-9f6f-388f3d155d43> /Volumes/VOLUME/*/libopencv_highgui.3.4.18.dylib
+       0x1093c0000 -        0x1093e7fff libc++abi.1.0.dylib (*) <6d835318-cd44-3ff1-99a8-f269622b0108> /Volumes/VOLUME/*/libc++abi.1.0.dylib
+       0x10c0c8000 -        0x10c16bfff libc++.1.0.dylib (*) <dbadeba0-3b73-3f2a-a0c5-005b7c46b914> /Volumes/VOLUME/*/libc++.1.0.dylib
+       0x103ec0000 -        0x103ed3fff libz.dylib (*) <329dd359-153d-3d12-9141-8bccecc2b9d0> /Volumes/VOLUME/*/libz.dylib
+       0x1098a0000 -        0x1098cbfff libopencv_videoio.3.4.18.dylib (*) <fe709335-d10e-3214-b3c6-6c7644464c2d> /Volumes/VOLUME/*/libopencv_videoio.3.4.18.dylib
+       0x109ec8000 -        0x109f33fff libopencv_imgcodecs.3.4.18.dylib (*) <43c3f30d-1e20-305d-b642-2de991dd88f7> /Volumes/VOLUME/*/libopencv_imgcodecs.3.4.18.dylib
+       0x109f60000 -        0x109fb7fff libjpeg.62.3.0.dylib (*) <837507ed-caae-3733-a4d4-05e988864f9b> /Volumes/VOLUME/*/libjpeg.62.3.0.dylib
+       0x109fc8000 -        0x10a01ffff libwebp.7.dylib (*) <09dfa0e4-df07-35ab-8ab4-194ea86dd243> /Volumes/VOLUME/*/libwebp.7.dylib
+       0x1076e4000 -        0x10770ffff libpng16.16.dylib (*) <5304cdb0-29ed-34b1-966c-c651355f8d58> /Volumes/VOLUME/*/libpng16.16.dylib
+       0x10c1d4000 -        0x10c23bfff libtiff.6.dylib (*) <829a90a5-9029-392e-83eb-7874bb9bcb42> /Volumes/VOLUME/*/libtiff.6.dylib
+       0x1025ec000 -        0x1025effff libsharpyuv.0.dylib (*) <8d5ee12e-5a28-352f-a38a-8233d77b961f> /Volumes/VOLUME/*/libsharpyuv.0.dylib
+       0x1090dc000 -        0x1090fffff liblzma.5.dylib (*) <d19ed4c4-fce3-3b2d-8228-74fdb82214de> /Volumes/VOLUME/*/liblzma.5.dylib
+       0x1040ac000 -        0x1040bbfff libdeflate.0.dylib (*) <79fa2e18-e8fe-3398-b9ca-2face9da6625> /Volumes/VOLUME/*/libdeflate.0.dylib
+       0x10a654000 -        0x10a737fff plugin.dylib (*) <9e5ee90a-b96d-3fe3-8f95-3f1f272fe4f4> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x109de4000 -        0x109e63fff plugin.dylib (*) <d32fed80-b8e0-3aa4-a7cb-834fc61d4bb3> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x109690000 -        0x1096bffff plugin.dylib (*) <d281fc62-a013-3761-a5cb-75688abaf41e> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x10cd00000 -        0x10d5a3fff plugin.dylib (*) <b869f073-fd50-3cce-8c11-e047852d8330> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x106e74000 -        0x106e97fff plugin.dylib (*) <3209ec4d-5542-375c-8aa1-ff3d64c8ce57> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x109620000 -        0x10965bfff plugin.dylib (*) <bedef5e9-46f4-3811-b6be-f6b269f5ee61> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x1034f8000 -        0x1034fffff plugin.dylib (*) <e9cfeee1-bfeb-3471-bddd-3aedbb22c730> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x109360000 -        0x109397fff plugin.dylib (*) <5189cb58-6e8d-392f-8c03-7916973c2ecf> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x10a434000 -        0x10a5ebfff plugin.dylib (*) <e6bebbd0-f4b3-3e02-81e0-d17b24ef3cc5> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x1026ac000 -        0x1026b3fff plugin.dylib (*) <54fb8818-2144-3052-8c92-6b52ceb4f952> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x102658000 -        0x102663fff plugin.dylib (*) <1c74bc94-ab8d-3117-9fe5-b5aa35c2aa70> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x1097c8000 -        0x109843fff plugin.dylib (*) <f3c00cbe-16cb-3f44-9d0d-d3dcc4b58d89> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x109cfc000 -        0x109d7ffff plugin.dylib (*) <b145fab4-25e6-33ec-a861-44abc4cd3f39> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x1096f4000 -        0x10977bfff plugin.dylib (*) <77d0253f-04cc-3bf3-bab5-9cdcf43ca811> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x109084000 -        0x1090b3fff plugin.dylib (*) <01cb9061-ff80-3fe8-b546-d389b6c81092> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x10a090000 -        0x10a343fff plugin.dylib (*) <7c8d345b-2992-32fa-8839-fb4371e83f5b> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x10998c000 -        0x109cb7fff plugin.dylib (*) <952b7e60-74c4-3b61-b9c8-4239a4b10479> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x109014000 -        0x10904ffff plugin.dylib (*) <4834226d-4223-3b32-a0e8-5aefc30ab83f> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x109224000 -        0x1092bbfff plugin.dylib (*) <e2cadc16-dee1-3c39-9a38-78e77874a537> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x109420000 -        0x109533fff plugin.dylib (*) <e364850d-2d08-3d78-98ed-db29f1e02cc6> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x10911c000 -        0x1091affff plugin.dylib (*) <8761fd38-713c-3ba4-93fb-5734ebe1c92c> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x103ee0000 -        0x103efbfff plugin.dylib (*) <a2ceb17a-6f7f-3073-a5c6-f5307c8f8ab1> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x106ec0000 -        0x106f37fff libsndfile.1.dylib (*) <fa3f4aa7-5f65-322e-80c1-9a5c28662331> /Volumes/VOLUME/*/libsndfile.1.dylib
+       0x107730000 -        0x1077dffff libc++.1.0.dylib (*) <94320a8e-4c0a-39b0-a785-c9e9cd50c450> /Volumes/VOLUME/*/libc++.1.0.dylib
+       0x10405c000 -        0x104097fff libFLAC.14.0.0.dylib (*) <471022c5-fb6f-372e-b973-523426129803> /Volumes/VOLUME/*/libFLAC.14.0.0.dylib
+       0x103f20000 -        0x103f4ffff libvorbis.0.dylib (*) <3475db80-5f25-3f97-8fd6-25ad8748dbb0> /Volumes/VOLUME/*/libvorbis.0.dylib
+       0x107844000 -        0x1078bbfff libvorbisenc.2.dylib (*) <89d1a7b6-d34b-3f05-b841-259527e91274> /Volumes/VOLUME/*/libvorbisenc.2.dylib
+       0x107620000 -        0x107683fff libopus.0.dylib (*) <8c3cc48d-7a06-33b0-9d1c-3e9a66375468> /Volumes/VOLUME/*/libopus.0.dylib
+       0x102644000 -        0x10264bfff libogg.0.8.6.dylib (*) <c7b94378-c4e9-388c-8795-462fb8c95bbd> /Volumes/VOLUME/*/libogg.0.8.6.dylib
+       0x107694000 -        0x1076d3fff libmpg123.0.dylib (*) <fe8f2b73-008a-39ec-a917-96059d999b99> /Volumes/VOLUME/*/libmpg123.0.dylib
+       0x1078f4000 -        0x10793bfff libmp3lame.0.dylib (*) <95f5a25a-3336-3b96-82e6-eb9aa0123415> /Volumes/VOLUME/*/libmp3lame.0.dylib
+       0x108fbc000 -        0x108febfff libc++abi.1.0.dylib (*) <477c1a9d-af40-3a9d-b52e-5c09a9feb93c> /Volumes/VOLUME/*/libc++abi.1.0.dylib
+       0x106f50000 -        0x106ffffff plugin.dylib (*) <debc78d6-898c-34f2-95d4-1be54ae40fa3> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x10a7c4000 -        0x10af77fff plugin.dylib (*) <ba55bc3e-e8d0-3f0d-a07f-846db94fb3be> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x1074ec000 -        0x1075abfff plugin.dylib (*) <dfaadb0a-acbd-30f3-9c84-7c8a1215f173> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x103488000 -        0x10349ffff plugin.dylib (*) <16988e75-d084-3da0-ac94-e13d8ba35d64> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x1034c0000 -        0x1034dffff plugin.dylib (*) <6a3035bf-3ab0-3ee3-893c-2f0975a52d4f> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x102678000 -        0x102693fff plugin.dylib (*) <585723e5-9eb6-390d-972a-ae13bcfee0ab> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x103f7c000 -        0x10400bfff plugin.dylib (*) <99137923-4bd4-3daa-8eb4-623c533a5e38> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x103438000 -        0x103463fff plugin.dylib (*) <beb17477-6f4d-3acd-be48-15b614b8f803> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x1033e4000 -        0x10340ffff plugin.dylib (*) <81dad627-5773-394f-9ad8-18d2303a2122> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x103670000 -        0x1036c3fff plugin.dylib (*) <3532767a-42e3-34fd-b581-dc78e226f897> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x108b70000 -        0x108d37fff plugin.dylib (*) <57a9436c-0922-34ec-ba87-85ed3f7aa60e> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x106c18000 -        0x106d8bfff plugin.dylib (*) <7db33d82-e8ec-32b9-b3a4-c5fc5e4e69c6> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x103dd8000 -        0x103e53fff plugin.dylib (*) <8f4d23db-0a1a-3908-bc42-32aefcbc3df7> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x103528000 -        0x1035f3fff plugin.dylib (*) <12271dc8-478a-382e-b694-ce3cc89d3c0e> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x10707c000 -        0x10739bfff plugin.dylib (*) <406d9ce6-8a70-3477-9686-b12c552d74bb> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x102624000 -        0x10262ffff plugin.dylib (*) <347046b3-c708-3707-9a11-66c1c03961a8> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x10338c000 -        0x1033cbfff plugin.dylib (*) <cd4e4f80-d071-3ed7-9bae-bb88b1141508> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x102774000 -        0x1027cffff plugin.dylib (*) <facc10f8-2c34-3481-acad-82f392a688e3> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x1079a8000 -        0x107a67fff plugin.dylib (*) <4eb552b2-395a-3270-a159-519f5523ebbb> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x1026cc000 -        0x102737fff plugin.dylib (*) <2ecc1a8f-a083-3ad1-9218-faaa2478383a> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x102600000 -        0x10260ffff plugin.dylib (*) <775da891-aa39-37e7-8659-9ee92975145e> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x103ac0000 -        0x103ca3fff plugin.dylib (*) <f4e4f4f0-6d72-36ae-90d6-333f0830daae> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x103720000 -        0x1038fbfff plugin.dylib (*) <834a0ded-71f0-365b-a75d-5e0253578436> /Users/USER/Library/Application Support/Rack2/*/plugin.dylib
+       0x1040cc000 -        0x10499ffff libRack.dylib (*) <7d1fb093-b3d0-3ff1-854e-14f733d5faaa> /Applications/VCV Rack 2 Free.app/Contents/Resources/libRack.dylib
+       0x102400000 -        0x102403fff com.vcvrack.rack2 (2.6.4) <2e8bfa01-1076-3fe9-85ce-e63cb586a1fd> /Applications/VCV Rack 2 Free.app/Contents/MacOS/Rack
+               0x0 - 0xffffffffffffffff ??? (*) <00000000-0000-0000-0000-000000000000> ???
+       0x18f5a7000 -        0x18f63b317 dyld (*) <ec7a3ba0-f9bf-3ab8-a0f4-8622e5606b20> /usr/lib/dyld
+       0x18f922000 -        0x18f92eff3 libsystem_pthread.dylib (*) <daf95373-5de6-39a1-a6ce-d87f3f0629cc> /usr/lib/system/libsystem_pthread.dylib
+       0x18f8e7000 -        0x18f921fef libsystem_kernel.dylib (*) <b7751381-1442-30b5-91b9-ad7be461bebe> /usr/lib/system/libsystem_kernel.dylib
+       0x199c78000 -        0x199ca1fff com.apple.audio.caulk (1.0) <658fdd6b-bc2e-3383-a7ed-731ddbcc6372> /System/Library/PrivateFrameworks/caulk.framework/Versions/A/caulk
+       0x1a93e2000 -        0x1a9476fff com.apple.audio.midi.CoreMIDI (2.0) <a7910c78-cb09-3d88-8b47-6846deaa68eb> /System/Library/Frameworks/CoreMIDI.framework/Versions/A/CoreMIDI
+       0x18f954000 -        0x18f95affb libsystem_platform.dylib (*) <fc8cd17b-8769-348c-8dcd-1bfed022f9e4> /usr/lib/system/libsystem_platform.dylib
+       0x1969b0000 -        0x197594fff com.apple.Network (1.0) <f8a0aacd-1224-39d2-8ec8-e26514cb3e7b> /System/Library/Frameworks/Network.framework/Versions/A/Network
+       0x18f778000 -        0x18f7befff libdispatch.dylib (*) <dc1d0187-7149-3100-bc63-f633afebee6c> /usr/lib/system/libdispatch.dylib
+       0x18f95b000 -        0x18f987ffb libsystem_info.dylib (*) <d4f1ecdb-5aa0-3733-81d9-c9529001a13c> /usr/lib/system/libsystem_info.dylib
+
+External Modification Summary:
+  Calls made by other processes targeting this process:
+    task_for_pid: 0
+    thread_create: 0
+    thread_set_state: 0
+  Calls made by this process:
+    task_for_pid: 0
+    thread_create: 0
+    thread_set_state: 0
+  Calls made by all processes on this machine:
+    task_for_pid: 0
+    thread_create: 0
+    thread_set_state: 0
+
+VM Region Summary:
+ReadOnly portion of Libraries: Total=1.2G resident=0K(0%) swapped_out_or_unallocated=1.2G(100%)
+Writable regions: Total=1.1G written=0K(0%) resident=0K(0%) swapped_out=0K(0%) unallocated=1.1G(100%)
+
+                                VIRTUAL   REGION 
+REGION TYPE                        SIZE    COUNT (non-coalesced) 
+===========                     =======  ======= 
+Activity Tracing                   256K        1 
+Kernel Alloc Once                   32K        1 
+MALLOC                             1.1G       47 
+MALLOC guard page                  288K       18 
+STACK GUARD                       56.1M        9 
+Stack                             12.2M        9 
+VM_ALLOCATE                        176K        5 
+__AUTH                             815K      181 
+__AUTH_CONST                      15.2M      335 
+__DATA                            55.1M      418 
+__DATA_CONST                      21.7M      411 
+__DATA_DIRTY                       811K      119 
+__FONT_DATA                          4K        1 
+__LINKEDIT                       909.1M       74 
+__OBJC_RO                         70.8M        1 
+__OBJC_RW                         2156K        1 
+__TEXT                           370.3M      424 
+dyld private memory                272K        2 
+mapped file                       42.0M        3 
+shared memory                     1136K        7 
+===========                     =======  ======= 
+TOTAL                              2.6G     2067 
+
+
+
+-----------
+Full Report
+-----------
+
+{"app_name":"Rack","timestamp":"2025-10-13 20:44:27.00 +0100","app_version":"2.6.4","slice_uuid":"2e8bfa01-1076-3fe9-85ce-e63cb586a1fd","build_version":"2.6.4","platform":1,"bundleID":"com.vcvrack.rack2","share_with_app_devs":0,"is_first_party":0,"bug_type":"309","os_version":"macOS 14.1 (23B74)","roots_installed":0,"name":"Rack","incident_id":"93B4AA04-7249-4834-94F0-0EEEDB619F1B"}
+{
+  "uptime" : 5700000,
+  "procRole" : "Background",
+  "version" : 2,
+  "userID" : 501,
+  "deployVersion" : 210,
+  "modelCode" : "Mac14,6",
+  "coalitionID" : 899096,
+  "osVersion" : {
+    "train" : "macOS 14.1",
+    "build" : "23B74",
+    "releaseType" : "User"
+  },
+  "captureTime" : "2025-10-13 20:44:26.9394 +0100",
+  "codeSigningMonitor" : 1,
+  "incident" : "93B4AA04-7249-4834-94F0-0EEEDB619F1B",
+  "pid" : 46377,
+  "translated" : false,
+  "cpuType" : "ARM-64",
+  "roots_installed" : 0,
+  "bug_type" : "309",
+  "procLaunch" : "2025-10-13 20:44:26.3747 +0100",
+  "procStartAbsTime" : 137207192967000,
+  "procExitAbsTime" : 137207206343699,
+  "procName" : "Rack",
+  "procPath" : "\/Applications\/VCV Rack 2 Free.app\/Contents\/MacOS\/Rack",
+  "bundleInfo" : {"CFBundleShortVersionString":"2.6.4","CFBundleVersion":"2.6.4","CFBundleIdentifier":"com.vcvrack.rack2"},
+  "storeInfo" : {"deviceIdentifierForVendor":"D2EC7265-4EEA-5FCA-A2EF-1A6A02416D84","thirdParty":true},
+  "parentProc" : "launchd",
+  "parentPid" : 1,
+  "coalitionName" : "com.vcvrack.rack2",
+  "crashReporterKey" : "4B92930B-B1D9-94DB-EC02-1E820687FE84",
+  "codeSigningID" : "com.vcvrack.rack2",
+  "codeSigningTeamID" : "V8SW9J626X",
+  "codeSigningFlags" : 570491397,
+  "codeSigningValidationCategory" : 6,
+  "codeSigningTrustLevel" : 4294967295,
+  "wakeTime" : 283214,
+  "sleepWakeUUID" : "02D80A26-81A2-42BC-A097-639417363A40",
+  "sip" : "enabled",
+  "vmRegionInfo" : "0 is not in any region.  Bytes before following region: 4332716032\n      REGION TYPE                    START - END         [ VSIZE] PRT\/MAX SHRMOD  REGION DETAIL\n      UNUSED SPACE AT START\n--->  \n      __TEXT                      102400000-102404000    [   16K] r-x\/r-x SM=COW  ...ts\/MacOS\/Rack",
+  "exception" : {"codes":"0x0000000000000001, 0x0000000000000000","rawCodes":[1,0],"type":"EXC_BAD_ACCESS","signal":"SIGSEGV","subtype":"KERN_INVALID_ADDRESS at 0x0000000000000000"},
+  "vmregioninfo" : "0 is not in any region.  Bytes before following region: 4332716032\n      REGION TYPE                    START - END         [ VSIZE] PRT\/MAX SHRMOD  REGION DETAIL\n      UNUSED SPACE AT START\n--->  \n      __TEXT                      102400000-102404000    [   16K] r-x\/r-x SM=COW  ...ts\/MacOS\/Rack",
+  "extMods" : {"caller":{"thread_create":0,"thread_set_state":0,"task_for_pid":0},"system":{"thread_create":0,"thread_set_state":0,"task_for_pid":0},"targeted":{"thread_create":0,"thread_set_state":0,"task_for_pid":0},"warnings":0},
+  "faultingThread" : 0,
+  "threads" : [{"triggered":true,"id":142827354,"threadState":{"x":[{"value":4420725000,"symbolLocation":208,"symbol":"_MergedGlobals"},{"value":6134159308},{"value":0},{"value":6134168480},{"value":8153187808,"symbolLocation":16,"symbol":"dyld4::gDyld"},{"value":0},{"value":0},{"value":0},{"value":0},{"value":15315735984236920855},{"value":240},{"value":2},{"value":0},{"value":0},{"value":2},{"value":123645486653812},{"value":6703693604,"symbolLocation":0,"symbol":"pthread_cond_broadcast"},{"value":6703691860,"symbolLocation":156,"symbol":"_pthread_mutex_check_init_slow"},{"value":0},{"value":4497841992,"symbolLocation":400,"symbol":"_MergedGlobals"},{"value":4497841992,"symbolLocation":400,"symbol":"_MergedGlobals"},{"value":4337015696},{"value":8130080744,"symbolLocation":0,"symbol":"__stdinp"},{"value":4497114144},{"value":4497841592,"symbolLocation":0,"symbol":"_MergedGlobals"},{"value":4497115144},{"value":6134160304},{"value":4497114144},{"value":9223372036854775799}],"flavor":"ARM_THREAD_STATE64","lr":{"value":4497333176},"cpsr":{"value":1610616832},"fp":{"value":6134159536},"sp":{"value":6134159520},"esr":{"value":1442840704,"description":" Address size fault"},"pc":{"value":0},"far":{"value":0}},"queue":"com.apple.main-thread","frames":[{"imageOffset":0,"imageIndex":73},{"imageOffset":218140,"symbol":"std::__1::DoIOSInit::DoIOSInit()","symbolLocation":148,"imageIndex":5},{"imageOffset":223700,"symbol":"_GLOBAL__I_000100","symbolLocation":72,"imageIndex":5},{"imageOffset":141860,"symbol":"invocation function for block in dyld4::Loader::findAndRunAllInitializers(dyld4::RuntimeState&) const::$_0::operator()() const","symbolLocation":168,"imageIndex":74},{"imageOffset":426228,"symbol":"invocation function for block in dyld3::MachOAnalyzer::forEachInitializer(Diagnostics&, dyld3::MachOAnalyzer::VMAddrConverter const&, void (unsigned int) block_pointer, void const*) const","symbolLocation":172,"imageIndex":74},{"imageOffset":374376,"symbol":"invocation function for block in dyld3::MachOFile::forEachSection(void (dyld3::MachOFile::SectionInfo const&, bool, bool&) block_pointer) const","symbolLocation":496,"imageIndex":74},{"imageOffset":8956,"symbol":"dyld3::MachOFile::forEachLoadCommand(Diagnostics&, void (load_command const*, bool&) block_pointer) const","symbolLocation":300,"imageIndex":74},{"imageOffset":370336,"symbol":"dyld3::MachOFile::forEachSection(void (dyld3::MachOFile::SectionInfo const&, bool, bool&) block_pointer) const","symbolLocation":192,"imageIndex":74},{"imageOffset":381320,"symbol":"dyld3::MachOFile::forEachInitializerPointerSection(Diagnostics&, void (unsigned int, unsigned int, bool&) block_pointer) const","symbolLocation":160,"imageIndex":74},{"imageOffset":425448,"symbol":"dyld3::MachOAnalyzer::forEachInitializer(Diagnostics&, dyld3::MachOAnalyzer::VMAddrConverter const&, void (unsigned int) block_pointer, void const*) const","symbolLocation":432,"imageIndex":74},{"imageOffset":125752,"symbol":"dyld4::Loader::findAndRunAllInitializers(dyld4::RuntimeState&) const","symbolLocation":524,"imageIndex":74},{"imageOffset":151408,"symbol":"dyld4::JustInTimeLoader::runInitializers(dyld4::RuntimeState&) const","symbolLocation":36,"imageIndex":74},{"imageOffset":126756,"symbol":"dyld4::Loader::runInitializersBottomUp(dyld4::RuntimeState&, dyld3::Array<dyld4::Loader const*>&) const","symbolLocation":220,"imageIndex":74},{"imageOffset":126720,"symbol":"dyld4::Loader::runInitializersBottomUp(dyld4::RuntimeState&, dyld3::Array<dyld4::Loader const*>&) const","symbolLocation":184,"imageIndex":74},{"imageOffset":126720,"symbol":"dyld4::Loader::runInitializersBottomUp(dyld4::RuntimeState&, dyld3::Array<dyld4::Loader const*>&) const","symbolLocation":184,"imageIndex":74},{"imageOffset":142000,"symbol":"dyld4::Loader::runInitializersBottomUpPlusUpwardLinks(dyld4::RuntimeState&) const::$_1::operator()() const","symbolLocation":112,"imageIndex":74},{"imageOffset":127216,"symbol":"dyld4::Loader::runInitializersBottomUpPlusUpwardLinks(dyld4::RuntimeState&) const","symbolLocation":380,"imageIndex":74},{"imageOffset":251820,"symbol":"dyld4::APIs::dlopen_from(char const*, int, void*)","symbolLocation":1576,"imageIndex":74},{"imageOffset":471980,"symbol":"rack::plugin::loadPlugin(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>)","symbolLocation":932,"imageIndex":71},{"imageOffset":468576,"symbol":"rack::plugin::init()","symbolLocation":1776,"imageIndex":71},{"imageOffset":8120,"symbol":"main","symbolLocation":2876,"imageIndex":72},{"imageOffset":24800,"symbol":"start","symbolLocation":2360,"imageIndex":74}]},{"id":142827372,"frames":[{"imageOffset":7720,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":75}],"threadState":{"x":[{"value":6134722560},{"value":4099},{"value":6134185984},{"value":0},{"value":409604},{"value":18446744073709551615},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":4096},"fp":{"value":0},"sp":{"value":6134722560},"esr":{"value":1442840704,"description":" Address size fault"},"pc":{"value":6703693352},"far":{"value":0}}},{"id":142827374,"frames":[{"imageOffset":7720,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":75}],"threadState":{"x":[{"value":6135296000},{"value":9987},{"value":6134759424},{"value":0},{"value":409604},{"value":18446744073709551615},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":4096},"fp":{"value":0},"sp":{"value":6135296000},"esr":{"value":1442840704,"description":" Address size fault"},"pc":{"value":6703693352},"far":{"value":0}}},{"id":142827375,"frames":[{"imageOffset":7720,"symbol":"start_wqthread","symbolLocation":0,"imageIndex":75}],"threadState":{"x":[{"value":6135869440},{"value":0},{"value":6135332864},{"value":0},{"value":278532},{"value":18446744073709551615},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":0},"cpsr":{"value":4096},"fp":{"value":0},"sp":{"value":6135869440},"esr":{"value":0,"description":" Address size fault"},"pc":{"value":6703693352},"far":{"value":0}}},{"id":142827376,"name":"caulk.messenger.shared:17","threadState":{"x":[{"value":14},{"value":105553158702714},{"value":0},{"value":6136442986},{"value":105553158702688},{"value":25},{"value":0},{"value":0},{"value":0},{"value":4294967295},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":18446744073709551580},{"value":8299222440},{"value":0},{"value":105553136583728},{"value":105553136583728},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":6874965648},"cpsr":{"value":2147487744},"fp":{"value":6136442752},"sp":{"value":6136442720},"esr":{"value":1442840704,"description":" Address size fault"},"pc":{"value":6703450160},"far":{"value":0}},"frames":[{"imageOffset":6192,"symbol":"semaphore_wait_trap","symbolLocation":8,"imageIndex":76},{"imageOffset":9872,"symbol":"caulk::semaphore::timed_wait(double)","symbolLocation":212,"imageIndex":77},{"imageOffset":9540,"symbol":"caulk::concurrent::details::worker_thread::run()","symbolLocation":36,"imageIndex":77},{"imageOffset":8772,"symbol":"void* caulk::thread_proxy<std::__1::tuple<caulk::thread::attributes, void (caulk::concurrent::details::worker_thread::*)(), std::__1::tuple<caulk::concurrent::details::worker_thread*>>>(void*)","symbolLocation":96,"imageIndex":77},{"imageOffset":28724,"symbol":"_pthread_start","symbolLocation":136,"imageIndex":75},{"imageOffset":7740,"symbol":"thread_start","symbolLocation":8,"imageIndex":75}]},{"id":142827377,"name":"caulk.messenger.shared:high","threadState":{"x":[{"value":14},{"value":105553158703644},{"value":0},{"value":6137016428},{"value":105553158703616},{"value":27},{"value":0},{"value":0},{"value":0},{"value":4294967295},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":18446744073709551580},{"value":8299222440},{"value":0},{"value":105553136585184},{"value":105553136585184},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0},{"value":0}],"flavor":"ARM_THREAD_STATE64","lr":{"value":6874965648},"cpsr":{"value":2147487744},"fp":{"value":6137016192},"sp":{"value":6137016160},"esr":{"value":1442840704,"description":" Address size fault"},"pc":{"value":6703450160},"far":{"value":0}},"frames":[{"imageOffset":6192,"symbol":"semaphore_wait_trap","symbolLocation":8,"imageIndex":76},{"imageOffset":9872,"symbol":"caulk::semaphore::timed_wait(double)","symbolLocation":212,"imageIndex":77},{"imageOffset":9540,"symbol":"caulk::concurrent::details::worker_thread::run()","symbolLocation":36,"imageIndex":77},{"imageOffset":8772,"symbol":"void* caulk::thread_proxy<std::__1::tuple<caulk::thread::attributes, void (caulk::concurrent::details::worker_thread::*)(), std::__1::tuple<caulk::concurrent::details::worker_thread*>>>(void*)","symbolLocation":96,"imageIndex":77},{"imageOffset":28724,"symbol":"_pthread_start","symbolLocation":136,"imageIndex":75},{"imageOffset":7740,"symbol":"thread_start","symbolLocation":8,"imageIndex":75}]},{"id":142827414,"frames":[{"imageOffset":6324,"symbol":"mach_msg2_trap","symbolLocation":8,"imageIndex":76},{"imageOffset":81200,"symbol":"mach_msg2_internal","symbolLocation":80,"imageIndex":76},{"imageOffset":42224,"symbol":"mach_msg_overwrite","symbolLocation":476,"imageIndex":76},{"imageOffset":7224,"symbol":"mach_msg","symbolLocation":24,"imageIndex":76},{"imageOffset":214156,"symbol":"XServerMachPort::ReceiveMessage(int&, void*, int&)","symbolLocation":104,"imageIndex":78},{"imageOffset":284268,"symbol":"MIDIProcess::MIDIInPortThread::Run()","symbolLocation":156,"imageIndex":78},{"imageOffset":272996,"symbol":"CADeprecated::XThread::RunHelper(void*)","symbolLocation":48,"imageIndex":78},{"imageOffset":280256,"symbol":"CADeprecated::CAPThread::Entry(CADeprecated::CAPThread*)","symbolLocation":92,"imageIndex":78},{"imageOffset":28724,"symbol":"_pthread_start","symbolLocation":136,"imageIndex":75},{"imageOffset":7740,"symbol":"thread_start","symbolLocation":8,"imageIndex":75}],"threadState":{"x":[{"value":268451845},{"value":17179869186},{"value":0},{"value":275990303473664},{"value":0},{"value":275990303473664},{"value":100},{"value":0},{"value":18446744073709550527},{"value":64259},{"value":0},{"value":1},{"value":64259},{"value":0},{"value":0},{"value":0},{"value":18446744073709551569},{"value":8299216944},{"value":0},{"value":0},{"value":100},{"value":275990303473664},{"value":0},{"value":275990303473664},{"value":6137588176},{"value":0},{"value":17179869186},{"value":17179869186},{"value":2}],"flavor":"ARM_THREAD_STATE64","lr":{"value":6703525168},"cpsr":{"value":4096},"fp":{"value":6137587840},"sp":{"value":6137587760},"esr":{"value":1442840704,"description":" Address size fault"},"pc":{"value":6703450292},"far":{"value":0}}},{"id":142827435,"frames":[{"imageOffset":51732,"symbol":"__select","symbolLocation":8,"imageIndex":76},{"imageOffset":1890064,"symbol":"Curl_poll","symbolLocation":576,"imageIndex":71},{"imageOffset":1865776,"symbol":"multi_wait","symbolLocation":444,"imageIndex":71},{"imageOffset":1791204,"symbol":"curl_easy_perform","symbolLocation":412,"imageIndex":71},{"imageOffset":448560,"symbol":"rack::network::requestDownload(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, float*, std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>>> const&)","symbolLocation":364,"imageIndex":71},{"imageOffset":245408,"symbol":"rack::drm::Context::download()","symbolLocation":876,"imageIndex":17},{"imageOffset":246544,"symbol":"void* std::__1::__thread_proxy[abi:v15006]<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct>>, void (*)(void*), void*>>(void*)","symbolLocation":44,"imageIndex":17},{"imageOffset":28724,"symbol":"_pthread_start","symbolLocation":136,"imageIndex":75},{"imageOffset":7740,"symbol":"thread_start","symbolLocation":8,"imageIndex":75}],"threadState":{"x":[{"value":4},{"value":0},{"value":6138161968},{"value":6138161840},{"value":6138162232},{"value":1},{"value":1},{"value":6138157632},{"value":8000},{"value":1000},{"value":8},{"value":6138162096},{"value":3},{"value":0},{"value":0},{"value":0},{"value":93},{"value":6138155217},{"value":0},{"value":6138162480},{"value":8},{"value":6138162096},{"value":0},{"value":6703539988,"symbolLocation":0,"symbol":"__darwin_check_fd_set_overflow"},{"value":6138161968},{"value":6138161840},{"value":199},{"value":2},{"value":1}],"flavor":"ARM_THREAD_STATE64","lr":{"value":4364801808},"cpsr":{"value":2684358656},"fp":{"value":6138162336},"sp":{"value":6138161840},"esr":{"value":1442840704,"description":" Address size fault"},"pc":{"value":6703495700},"far":{"value":0}}},{"id":142827436,"frames":[{"imageOffset":13932,"symbol":"__ulock_wait","symbolLocation":8,"imageIndex":76},{"imageOffset":5900,"symbol":"_os_unfair_lock_lock_slow","symbolLocation":208,"imageIndex":79},{"imageOffset":250620,"symbol":"dyld4::APIs::dlopen_from(char const*, int, void*)","symbolLocation":376,"imageIndex":74},{"imageOffset":7548700,"symbol":"__nw_protocol_get_tcp_image_block_invoke","symbolLocation":60,"imageIndex":80},{"imageOffset":14608,"symbol":"_dispatch_client_callout","symbolLocation":20,"imageIndex":81},{"imageOffset":20812,"symbol":"_dispatch_once_callout","symbolLocation":32,"imageIndex":81},{"imageOffset":7550212,"symbol":"__nw_protocol_get_tcp_identifier_block_invoke","symbolLocation":688,"imageIndex":80},{"imageOffset":14608,"symbol":"_dispatch_client_callout","symbolLocation":20,"imageIndex":81},{"imageOffset":20812,"symbol":"_dispatch_once_callout","symbolLocation":32,"imageIndex":81},{"imageOffset":7550616,"symbol":"__nw_protocol_setup_tcp_definition_block_invoke","symbolLocation":312,"imageIndex":80},{"imageOffset":14608,"symbol":"_dispatch_client_callout","symbolLocation":20,"imageIndex":81},{"imageOffset":20812,"symbol":"_dispatch_once_callout","symbolLocation":32,"imageIndex":81},{"imageOffset":2999384,"symbol":"nw_parameters_create_legacy_tcp_socket","symbolLocation":1948,"imageIndex":80},{"imageOffset":7999576,"symbol":"nw_path_libinfo_path_check","symbolLocation":260,"imageIndex":80},{"imageOffset":22648,"symbol":"si_addrinfo","symbolLocation":544,"imageIndex":82},{"imageOffset":21936,"symbol":"getaddrinfo","symbolLocation":168,"imageIndex":82},{"imageOffset":1771308,"symbol":"Curl_getaddrinfo_ex","symbolLocation":48,"imageIndex":71},{"imageOffset":1704692,"symbol":"getaddrinfo_thread","symbolLocation":92,"imageIndex":71},{"imageOffset":1773812,"symbol":"curl_thread_create_thunk","symbolLocation":40,"imageIndex":71},{"imageOffset":28724,"symbol":"_pthread_start","symbolLocation":136,"imageIndex":75},{"imageOffset":7740,"symbol":"thread_start","symbolLocation":8,"imageIndex":75}],"threadState":{"x":[{"value":18446744073709551612},{"value":0},{"value":258},{"value":0},{"value":8213644392,"symbolLocation":120,"symbol":"vtable for dyld4::LibSystemHelpers"},{"value":0},{"value":0},{"value":6138734766},{"value":258},{"value":259},{"value":4337016512},{"value":4337016488},{"value":9788991651},{"value":1},{"value":9788991639},{"value":5437966104},{"value":515},{"value":8299232832},{"value":0},{"value":45571},{"value":0},{"value":6134167952},{"value":16777218},{"value":258},{"value":0},{"value":4294967295},{"value":45571},{"value":6138736492},{"value":105553160767104}],"flavor":"ARM_THREAD_STATE64","lr":{"value":6703896332},"cpsr":{"value":1073745920},"fp":{"value":6138734880},"sp":{"value":6138734816},"esr":{"value":1442840704,"description":" Address size fault"},"pc":{"value":6703457900},"far":{"value":0}}}],
+  "usedImages" : [
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4496080896,
+    "size" : 688128,
+    "uuid" : "8aa51f46-8e6e-32e0-a273-40d84f30e4a1",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4499881984,
+    "size" : 2195456,
+    "uuid" : "5246d993-288b-33f5-86d4-c64ad236bbad",
+    "path" : "\/Volumes\/VOLUME\/*\/libopencv_core.3.4.18.dylib",
+    "name" : "libopencv_core.3.4.18.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4505960448,
+    "size" : 2539520,
+    "uuid" : "4908d154-e8cd-30d2-ba48-47aaf931f8b4",
+    "path" : "\/Volumes\/VOLUME\/*\/libopencv_imgproc.3.4.18.dylib",
+    "name" : "libopencv_imgproc.3.4.18.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4360634368,
+    "size" : 65536,
+    "uuid" : "7ea1ad1c-67d8-3f0d-9f6f-388f3d155d43",
+    "path" : "\/Volumes\/VOLUME\/*\/libopencv_highgui.3.4.18.dylib",
+    "name" : "libopencv_highgui.3.4.18.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4449894400,
+    "size" : 163840,
+    "uuid" : "6d835318-cd44-3ff1-99a8-f269622b0108",
+    "path" : "\/Volumes\/VOLUME\/*\/libc++abi.1.0.dylib",
+    "name" : "libc++abi.1.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4497113088,
+    "size" : 671744,
+    "uuid" : "dbadeba0-3b73-3f2a-a0c5-005b7c46b914",
+    "path" : "\/Volumes\/VOLUME\/*\/libc++.1.0.dylib",
+    "name" : "libc++.1.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4360765440,
+    "size" : 81920,
+    "uuid" : "329dd359-153d-3d12-9141-8bccecc2b9d0",
+    "path" : "\/Volumes\/VOLUME\/*\/libz.dylib",
+    "name" : "libz.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4455006208,
+    "size" : 180224,
+    "uuid" : "fe709335-d10e-3214-b3c6-6c7644464c2d",
+    "path" : "\/Volumes\/VOLUME\/*\/libopencv_videoio.3.4.18.dylib",
+    "name" : "libopencv_videoio.3.4.18.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4461461504,
+    "size" : 442368,
+    "uuid" : "43c3f30d-1e20-305d-b642-2de991dd88f7",
+    "path" : "\/Volumes\/VOLUME\/*\/libopencv_imgcodecs.3.4.18.dylib",
+    "name" : "libopencv_imgcodecs.3.4.18.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4462084096,
+    "size" : 360448,
+    "uuid" : "837507ed-caae-3733-a4d4-05e988864f9b",
+    "path" : "\/Volumes\/VOLUME\/*\/libjpeg.62.3.0.dylib",
+    "name" : "libjpeg.62.3.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4462510080,
+    "size" : 360448,
+    "uuid" : "09dfa0e4-df07-35ab-8ab4-194ea86dd243",
+    "path" : "\/Volumes\/VOLUME\/*\/libwebp.7.dylib",
+    "name" : "libwebp.7.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4419633152,
+    "size" : 180224,
+    "uuid" : "5304cdb0-29ed-34b1-966c-c651355f8d58",
+    "path" : "\/Volumes\/VOLUME\/*\/libpng16.16.dylib",
+    "name" : "libpng16.16.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4498210816,
+    "size" : 425984,
+    "uuid" : "829a90a5-9029-392e-83eb-7874bb9bcb42",
+    "path" : "\/Volumes\/VOLUME\/*\/libtiff.6.dylib",
+    "name" : "libtiff.6.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4334731264,
+    "size" : 16384,
+    "uuid" : "8d5ee12e-5a28-352f-a38a-8233d77b961f",
+    "path" : "\/Volumes\/VOLUME\/*\/libsharpyuv.0.dylib",
+    "name" : "libsharpyuv.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4446863360,
+    "size" : 147456,
+    "uuid" : "d19ed4c4-fce3-3b2d-8228-74fdb82214de",
+    "path" : "\/Volumes\/VOLUME\/*\/liblzma.5.dylib",
+    "name" : "liblzma.5.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4362780672,
+    "size" : 65536,
+    "uuid" : "79fa2e18-e8fe-3398-b9ca-2face9da6625",
+    "path" : "\/Volumes\/VOLUME\/*\/libdeflate.0.dylib",
+    "name" : "libdeflate.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4469374976,
+    "size" : 933888,
+    "uuid" : "9e5ee90a-b96d-3fe3-8f95-3f1f272fe4f4",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4460527616,
+    "size" : 524288,
+    "uuid" : "d32fed80-b8e0-3aa4-a7cb-834fc61d4bb3",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4452843520,
+    "size" : 196608,
+    "uuid" : "d281fc62-a013-3761-a5cb-75688abaf41e",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4509925376,
+    "size" : 9060352,
+    "uuid" : "b869f073-fd50-3cce-8c11-e047852d8330",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4410785792,
+    "size" : 147456,
+    "uuid" : "3209ec4d-5542-375c-8aa1-ff3d64c8ce57",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4452384768,
+    "size" : 245760,
+    "uuid" : "bedef5e9-46f4-3811-b6be-f6b269f5ee61",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4350509056,
+    "size" : 32768,
+    "uuid" : "e9cfeee1-bfeb-3471-bddd-3aedbb22c730",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4449501184,
+    "size" : 229376,
+    "uuid" : "5189cb58-6e8d-392f-8c03-7916973c2ecf",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4467146752,
+    "size" : 1802240,
+    "uuid" : "e6bebbd0-f4b3-3e02-81e0-d17b24ef3cc5",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4335517696,
+    "size" : 32768,
+    "uuid" : "54fb8818-2144-3052-8c92-6b52ceb4f952",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4335173632,
+    "size" : 49152,
+    "uuid" : "1c74bc94-ab8d-3117-9fe5-b5aa35c2aa70",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4454121472,
+    "size" : 507904,
+    "uuid" : "f3c00cbe-16cb-3f44-9d0d-d3dcc4b58d89",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4459577344,
+    "size" : 540672,
+    "uuid" : "b145fab4-25e6-33ec-a861-44abc4cd3f39",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4453253120,
+    "size" : 557056,
+    "uuid" : "77d0253f-04cc-3bf3-bab5-9cdcf43ca811",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4446502912,
+    "size" : 196608,
+    "uuid" : "01cb9061-ff80-3fe8-b546-d389b6c81092",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4463329280,
+    "size" : 2834432,
+    "uuid" : "7c8d345b-2992-32fa-8839-fb4371e83f5b",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4455972864,
+    "size" : 3325952,
+    "uuid" : "952b7e60-74c4-3b61-b9c8-4239a4b10479",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4446044160,
+    "size" : 245760,
+    "uuid" : "4834226d-4223-3b32-a0e8-5aefc30ab83f",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4448206848,
+    "size" : 622592,
+    "uuid" : "e2cadc16-dee1-3c39-9a38-78e77874a537",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4450287616,
+    "size" : 1130496,
+    "uuid" : "e364850d-2d08-3d78-98ed-db29f1e02cc6",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4447125504,
+    "size" : 606208,
+    "uuid" : "8761fd38-713c-3ba4-93fb-5734ebe1c92c",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4360896512,
+    "size" : 114688,
+    "uuid" : "a2ceb17a-6f7f-3073-a5c6-f5307c8f8ab1",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4411097088,
+    "size" : 491520,
+    "uuid" : "fa3f4aa7-5f65-322e-80c1-9a5c28662331",
+    "path" : "\/Volumes\/VOLUME\/*\/libsndfile.1.dylib",
+    "name" : "libsndfile.1.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4419944448,
+    "size" : 720896,
+    "uuid" : "94320a8e-4c0a-39b0-a785-c9e9cd50c450",
+    "path" : "\/Volumes\/VOLUME\/*\/libc++.1.0.dylib",
+    "name" : "libc++.1.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4362452992,
+    "size" : 245760,
+    "uuid" : "471022c5-fb6f-372e-b973-523426129803",
+    "path" : "\/Volumes\/VOLUME\/*\/libFLAC.14.0.0.dylib",
+    "name" : "libFLAC.14.0.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4361158656,
+    "size" : 196608,
+    "uuid" : "3475db80-5f25-3f97-8fd6-25ad8748dbb0",
+    "path" : "\/Volumes\/VOLUME\/*\/libvorbis.0.dylib",
+    "name" : "libvorbis.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4421074944,
+    "size" : 491520,
+    "uuid" : "89d1a7b6-d34b-3f05-b841-259527e91274",
+    "path" : "\/Volumes\/VOLUME\/*\/libvorbisenc.2.dylib",
+    "name" : "libvorbisenc.2.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4418830336,
+    "size" : 409600,
+    "uuid" : "8c3cc48d-7a06-33b0-9d1c-3e9a66375468",
+    "path" : "\/Volumes\/VOLUME\/*\/libopus.0.dylib",
+    "name" : "libopus.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4335091712,
+    "size" : 32768,
+    "uuid" : "c7b94378-c4e9-388c-8795-462fb8c95bbd",
+    "path" : "\/Volumes\/VOLUME\/*\/libogg.0.8.6.dylib",
+    "name" : "libogg.0.8.6.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4419305472,
+    "size" : 262144,
+    "uuid" : "fe8f2b73-008a-39ec-a917-96059d999b99",
+    "path" : "\/Volumes\/VOLUME\/*\/libmpg123.0.dylib",
+    "name" : "libmpg123.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4421795840,
+    "size" : 294912,
+    "uuid" : "95f5a25a-3336-3b96-82e6-eb9aa0123415",
+    "path" : "\/Volumes\/VOLUME\/*\/libmp3lame.0.dylib",
+    "name" : "libmp3lame.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4445683712,
+    "size" : 196608,
+    "uuid" : "477c1a9d-af40-3a9d-b52e-5c09a9feb93c",
+    "path" : "\/Volumes\/VOLUME\/*\/libc++abi.1.0.dylib",
+    "name" : "libc++abi.1.0.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4411686912,
+    "size" : 720896,
+    "uuid" : "debc78d6-898c-34f2-95d4-1be54ae40fa3",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4470882304,
+    "size" : 8077312,
+    "uuid" : "ba55bc3e-e8d0-3f0d-a07f-846db94fb3be",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4417568768,
+    "size" : 786432,
+    "uuid" : "dfaadb0a-acbd-30f3-9c84-7c8a1215f173",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4350050304,
+    "size" : 98304,
+    "uuid" : "16988e75-d084-3da0-ac94-e13d8ba35d64",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4350279680,
+    "size" : 131072,
+    "uuid" : "6a3035bf-3ab0-3ee3-893c-2f0975a52d4f",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4335304704,
+    "size" : 114688,
+    "uuid" : "585723e5-9eb6-390d-972a-ae13bcfee0ab",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4361535488,
+    "size" : 589824,
+    "uuid" : "99137923-4bd4-3daa-8eb4-623c533a5e38",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4349722624,
+    "size" : 180224,
+    "uuid" : "beb17477-6f4d-3acd-be48-15b614b8f803",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4349378560,
+    "size" : 180224,
+    "uuid" : "81dad627-5773-394f-9ad8-18d2303a2122",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4352049152,
+    "size" : 344064,
+    "uuid" : "3532767a-42e3-34fd-b581-dc78e226f897",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4441178112,
+    "size" : 1867776,
+    "uuid" : "57a9436c-0922-34ec-ba87-85ed3f7aa60e",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4408311808,
+    "size" : 1523712,
+    "uuid" : "7db33d82-e8ec-32b9-b3a4-c5fc5e4e69c6",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4359815168,
+    "size" : 507904,
+    "uuid" : "8f4d23db-0a1a-3908-bc42-32aefcbc3df7",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4350705664,
+    "size" : 835584,
+    "uuid" : "12271dc8-478a-382e-b694-ce3cc89d3c0e",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4412915712,
+    "size" : 3276800,
+    "uuid" : "406d9ce6-8a70-3477-9686-b12c552d74bb",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4334960640,
+    "size" : 49152,
+    "uuid" : "347046b3-c708-3707-9a11-66c1c03961a8",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4349018112,
+    "size" : 262144,
+    "uuid" : "cd4e4f80-d071-3ed7-9bae-bb88b1141508",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4336336896,
+    "size" : 376832,
+    "uuid" : "facc10f8-2c34-3481-acad-82f392a688e3",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4422533120,
+    "size" : 786432,
+    "uuid" : "4eb552b2-395a-3270-a159-519f5523ebbb",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4335648768,
+    "size" : 442368,
+    "uuid" : "2ecc1a8f-a083-3ad1-9218-faaa2478383a",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4334813184,
+    "size" : 65536,
+    "uuid" : "775da891-aa39-37e7-8659-9ee92975145e",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4356571136,
+    "size" : 1982464,
+    "uuid" : "f4e4f4f0-6d72-36ae-90d6-333f0830daae",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4352770048,
+    "size" : 1949696,
+    "uuid" : "834a0ded-71f0-365b-a75d-5e0253578436",
+    "path" : "\/Users\/USER\/Library\/Application Support\/Rack2\/*\/plugin.dylib",
+    "name" : "plugin.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4362911744,
+    "size" : 9256960,
+    "uuid" : "7d1fb093-b3d0-3ff1-854e-14f733d5faaa",
+    "path" : "\/Applications\/VCV Rack 2 Free.app\/Contents\/Resources\/libRack.dylib",
+    "name" : "libRack.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64",
+    "base" : 4332716032,
+    "CFBundleShortVersionString" : "2.6.4",
+    "CFBundleIdentifier" : "com.vcvrack.rack2",
+    "size" : 16384,
+    "uuid" : "2e8bfa01-1076-3fe9-85ce-e63cb586a1fd",
+    "path" : "\/Applications\/VCV Rack 2 Free.app\/Contents\/MacOS\/Rack",
+    "name" : "Rack",
+    "CFBundleVersion" : "2.6.4"
+  },
+  {
+    "size" : 0,
+    "source" : "A",
+    "base" : 0,
+    "uuid" : "00000000-0000-0000-0000-000000000000"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 6700036096,
+    "size" : 607000,
+    "uuid" : "ec7a3ba0-f9bf-3ab8-a0f4-8622e5606b20",
+    "path" : "\/usr\/lib\/dyld",
+    "name" : "dyld"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 6703685632,
+    "size" : 53236,
+    "uuid" : "daf95373-5de6-39a1-a6ce-d87f3f0629cc",
+    "path" : "\/usr\/lib\/system\/libsystem_pthread.dylib",
+    "name" : "libsystem_pthread.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 6703443968,
+    "size" : 241648,
+    "uuid" : "b7751381-1442-30b5-91b9-ad7be461bebe",
+    "path" : "\/usr\/lib\/system\/libsystem_kernel.dylib",
+    "name" : "libsystem_kernel.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 6874955776,
+    "CFBundleShortVersionString" : "1.0",
+    "CFBundleIdentifier" : "com.apple.audio.caulk",
+    "size" : 172032,
+    "uuid" : "658fdd6b-bc2e-3383-a7ed-731ddbcc6372",
+    "path" : "\/System\/Library\/PrivateFrameworks\/caulk.framework\/Versions\/A\/caulk",
+    "name" : "caulk"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 7134388224,
+    "CFBundleShortVersionString" : "2.0",
+    "CFBundleIdentifier" : "com.apple.audio.midi.CoreMIDI",
+    "size" : 610304,
+    "uuid" : "a7910c78-cb09-3d88-8b47-6846deaa68eb",
+    "path" : "\/System\/Library\/Frameworks\/CoreMIDI.framework\/Versions\/A\/CoreMIDI",
+    "name" : "CoreMIDI",
+    "CFBundleVersion" : "88"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 6703890432,
+    "size" : 28668,
+    "uuid" : "fc8cd17b-8769-348c-8dcd-1bfed022f9e4",
+    "path" : "\/usr\/lib\/system\/libsystem_platform.dylib",
+    "name" : "libsystem_platform.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 6821707776,
+    "CFBundleShortVersionString" : "1.0",
+    "CFBundleIdentifier" : "com.apple.Network",
+    "size" : 12472320,
+    "uuid" : "f8a0aacd-1224-39d2-8ec8-e26514cb3e7b",
+    "path" : "\/System\/Library\/Frameworks\/Network.framework\/Versions\/A\/Network",
+    "name" : "Network",
+    "CFBundleVersion" : "1"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 6701940736,
+    "size" : 290816,
+    "uuid" : "dc1d0187-7149-3100-bc63-f633afebee6c",
+    "path" : "\/usr\/lib\/system\/libdispatch.dylib",
+    "name" : "libdispatch.dylib"
+  },
+  {
+    "source" : "P",
+    "arch" : "arm64e",
+    "base" : 6703919104,
+    "size" : 184316,
+    "uuid" : "d4f1ecdb-5aa0-3733-81d9-c9529001a13c",
+    "path" : "\/usr\/lib\/system\/libsystem_info.dylib",
+    "name" : "libsystem_info.dylib"
+  }
+],
+  "sharedCache" : {
+  "base" : 6699286528,
+  "size" : 4018880512,
+  "uuid" : "43b9f010-3c81-318c-ba80-29c673a7757a"
+},
+  "vmSummary" : "ReadOnly portion of Libraries: Total=1.2G resident=0K(0%) swapped_out_or_unallocated=1.2G(100%)\nWritable regions: Total=1.1G written=0K(0%) resident=0K(0%) swapped_out=0K(0%) unallocated=1.1G(100%)\n\n                                VIRTUAL   REGION \nREGION TYPE                        SIZE    COUNT (non-coalesced) \n===========                     =======  ======= \nActivity Tracing                   256K        1 \nKernel Alloc Once                   32K        1 \nMALLOC                             1.1G       47 \nMALLOC guard page                  288K       18 \nSTACK GUARD                       56.1M        9 \nStack                             12.2M        9 \nVM_ALLOCATE                        176K        5 \n__AUTH                             815K      181 \n__AUTH_CONST                      15.2M      335 \n__DATA                            55.1M      418 \n__DATA_CONST                      21.7M      411 \n__DATA_DIRTY                       811K      119 \n__FONT_DATA                          4K        1 \n__LINKEDIT                       909.1M       74 \n__OBJC_RO                         70.8M        1 \n__OBJC_RW                         2156K        1 \n__TEXT                           370.3M      424 \ndyld private memory                272K        2 \nmapped file                       42.0M        3 \nshared memory                     1136K        7 \n===========                     =======  ======= \nTOTAL                              2.6G     2067 \n",
+  "legacyInfo" : {
+  "threadTriggered" : {
+    "queue" : "com.apple.main-thread"
+  }
+},
+  "logWritingSignature" : "173b492a9ac13f969a06c5d2979dfcadf8cacbdb",
+  "trialInfo" : {
+  "rollouts" : [
+    {
+      "rolloutId" : "654439cdafbf5b61207873a9",
+      "factorPackIds" : {
+
+      },
+      "deploymentId" : 240000004
+    },
+    {
+      "rolloutId" : "62699e1ec1ff2978b47f6c3b",
+      "factorPackIds" : {
+        "SIRI_FIND_MY_CONFIGURATION_FILES" : "652805151bce5442b8d752e1"
+      },
+      "deploymentId" : 240000031
+    }
+  ],
+  "experiments" : [
+
+  ]
+}
+}
+

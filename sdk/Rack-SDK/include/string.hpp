@@ -10,22 +10,38 @@ namespace rack {
 namespace string {
 
 
-/** Converts a `printf()` format string and optional arguments into a std::string.
-Remember that "%s" must reference a `char *`, so use `.c_str()` for `std::string`s, otherwise you will get binary garbage.
+/** Converts a printf format string and optional arguments into a std::string.
+The wrapper template function below automatically converts all arguments (including format string) from `std::string` to `const char*` as needed.
 */
 __attribute__((format(printf, 1, 2)))
 std::string f(const char* format, ...);
 std::string fV(const char* format, va_list args);
+
+// Converts std::string arguments of f() to `const char*`
+template<typename T>
+T convertFArg(const T& t) {return t;}
+inline const char* convertFArg(const std::string& s) {return s.c_str();}
+template<typename... Args>
+std::string f(Args... args) {
+	// Allows accessing the original f() above
+	typedef std::string (*FType)(const char* format, ...);
+	return FType(f)(convertFArg(args)...);
+}
+
 /** Replaces all characters to lowercase letters */
 std::string lowercase(const std::string& s);
 /** Replaces all characters to uppercase letters */
 std::string uppercase(const std::string& s);
 /** Removes whitespace from beginning and end of string. */
 std::string trim(const std::string& s);
-/** Truncates and adds "..." to the end of a string, not exceeding `len` characters. */
-std::string ellipsize(const std::string& s, size_t len);
-/** Truncates and adds "..." to the beginning of a string, not exceeding `len` characters. */
-std::string ellipsizePrefix(const std::string& s, size_t len);
+/** Truncates a string to not exceed a number of UTF-8 codepoints. */
+std::string truncate(const std::string& s, size_t maxCodepoints);
+/** Truncates the beginning of a string to not exceed a number of UTF-8 codepoints. */
+std::string truncatePrefix(const std::string& s, size_t maxCodepoints);
+/** Truncates and adds "…" to the end of a string, to not exceed a number of UTF-8 codepoints. */
+std::string ellipsize(const std::string& s, size_t maxCodepoints);
+/** Truncates and adds "…" to the beginning of a string, to not exceed a number of UTF-8 codepoints. */
+std::string ellipsizePrefix(const std::string& s, size_t maxCodepoints);
 /** Returns whether a string starts with the given substring. */
 bool startsWith(const std::string& str, const std::string& prefix);
 /** Returns whether a string ends with the given substring. */
@@ -77,6 +93,39 @@ std::vector<std::string> split(const std::string& s, const std::string& seperato
 std::string formatTime(const char* format, double timestamp);
 std::string formatTimeISO(double timestamp);
 
+// Unicode functions
+/** Converts a UTF-32 string to a UTF-8 string.
+Skips invalid UTF-32 codepoints (greater than 0x10FFFF).
+*/
+std::string UTF32toUTF8(const std::u32string& s32);
+/** Converts a UTF-8 string to a UTF-32 string.
+Skips invalid, overlong, and surrogate pair UTF-8 sequences.
+*/
+std::u32string UTF8toUTF32(const std::string& s8);
+/** Finds the byte position of the next codepoint in a valid UTF-8 string.
+pos is the byte position of the start of a codepoint.
+Returns s8.size() if given codepoint is the last.
+*/
+size_t UTF8NextCodepoint(const std::string& s8, size_t pos);
+/** Finds the byte position of the previous codepoint in a valid UTF-8 string.
+pos is the byte position of the start of a codepoint.
+Returns 0 if given codepoint is the first.
+*/
+size_t UTF8PrevCodepoint(const std::string& s8, size_t pos);
+/** Returns the number of codepoints in a valid UTF-8 string.
+O(len) time
+*/
+size_t UTF8Length(const std::string& s8);
+/** Returns a codepoint's index in a valid UTF-8 string.
+pos is the byte position of the start of a codepoint.
+O(pos) time
+*/
+size_t UTF8CodepointIndex(const std::string& s8, size_t pos);
+/** Returns a codepoint's byte position in a valid UTF-8 string.
+Returns s8.size() if index is beyond the last codepoint.
+O(index) time
+*/
+size_t UTF8CodepointPos(const std::string& s8, size_t index);
 
 #if defined ARCH_WIN
 /** Performs a Unicode string conversion from UTF-16 to UTF-8.
@@ -129,6 +178,15 @@ struct Version {
 		return get(parts, 2, "");
 	}
 };
+
+
+/** Returns translation string of the current language setting from `translations/<language>.json`, or English if not found. */
+std::string translate(const std::string& id);
+/** Returns translation string of the given language, or "" if not found. */
+std::string translate(const std::string& id, const std::string& language);
+/** Returns ISO 639-1 language codes of loaded translations, sorted by name of language. */
+std::vector<std::string> getLanguages();
+void init();
 
 
 } // namespace string

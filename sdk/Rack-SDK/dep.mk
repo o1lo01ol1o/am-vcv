@@ -13,7 +13,6 @@ DEP_FLAGS += -fPIC
 # Define compiler/linker target if cross-compiling
 ifdef CROSS_COMPILE
 	DEP_FLAGS += --target=$(MACHINE)
-	DEP_LDFLAGS += --target=$(MACHINE)
 endif
 
 ifdef ARCH_X64
@@ -25,12 +24,14 @@ endif
 
 ifdef ARCH_MAC
 	DEP_MAC_SDK_FLAGS := -mmacosx-version-min=10.9
-	DEP_FLAGS += $(DEP_MAC_SDK_FLAGS) -stdlib=libc++
-	DEP_LDFLAGS += $(DEP_MAC_SDK_FLAGS) -stdlib=libc++
+	DEP_FLAGS += $(DEP_MAC_SDK_FLAGS)
+	DEP_CXXFLAGS += -stdlib=libc++
+	DEP_LDFLAGS += -stdlib=libc++
 endif
 
 DEP_CFLAGS += $(DEP_FLAGS)
 DEP_CXXFLAGS += $(DEP_FLAGS)
+DEP_LDFLAGS += $(DEP_FLAGS)
 
 # Commands
 WGET := wget -c

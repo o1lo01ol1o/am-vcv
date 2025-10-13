@@ -64,14 +64,14 @@ struct ComplexAction : Action {
 Subclass this to create your own custom actions for your module.
 */
 struct ModuleAction : Action {
-	int64_t moduleId;
+	int64_t moduleId = -1;
 };
 
 
 struct ModuleAdd : ModuleAction {
-	plugin::Model* model;
+	plugin::Model* model = NULL;
 	math::Vec pos;
-	json_t* moduleJ;
+	json_t* moduleJ = NULL;
 	ModuleAdd() {
 		name = "add module";
 	}
@@ -101,7 +101,7 @@ struct ModuleMove : ModuleAction {
 
 
 struct ModuleBypass : ModuleAction {
-	bool bypassed;
+	bool bypassed = false;
 	void undo() override;
 	void redo() override;
 	ModuleBypass() {
@@ -111,8 +111,8 @@ struct ModuleBypass : ModuleAction {
 
 
 struct ModuleChange : ModuleAction {
-	json_t* oldModuleJ;
-	json_t* newModuleJ;
+	json_t* oldModuleJ = NULL;
+	json_t* newModuleJ = NULL;
 	ModuleChange() {
 		name = "change module";
 	}
@@ -123,9 +123,9 @@ struct ModuleChange : ModuleAction {
 
 
 struct ParamChange : ModuleAction {
-	int paramId;
-	float oldValue;
-	float newValue;
+	int paramId = -1;
+	float oldValue = 0.f;
+	float newValue = 0.f;
 	void undo() override;
 	void redo() override;
 	ParamChange() {
@@ -135,13 +135,14 @@ struct ParamChange : ModuleAction {
 
 
 struct CableAdd : Action {
-	int64_t cableId;
-	int64_t inputModuleId;
-	int inputId;
-	int64_t outputModuleId;
-	int outputId;
-	NVGcolor color;
+	int64_t cableId = -1;
+	int64_t inputModuleId = -1;
+	int inputId = -1;
+	int64_t outputModuleId = -1;
+	int outputId = -1;
+	NVGcolor color = color::BLACK_TRANSPARENT;
 	void setCable(app::CableWidget* cw);
+	bool isCable(app::CableWidget* cw) const;
 	void undo() override;
 	void redo() override;
 	CableAdd() {
@@ -158,9 +159,9 @@ struct CableRemove : InverseAction<CableAdd> {
 
 
 struct CableColorChange : Action {
-	int64_t cableId;
-	NVGcolor newColor;
-	NVGcolor oldColor;
+	int64_t cableId = -1;
+	NVGcolor newColor = color::BLACK_TRANSPARENT;
+	NVGcolor oldColor = color::BLACK_TRANSPARENT;
 	void setCable(app::CableWidget* cw);
 	void undo() override;
 	void redo() override;

@@ -105,8 +105,11 @@ struct Window {
 
 	/** Loads and caches a Font from a file path.
 	Do not store this reference across screen frames, as the Window may have changed, invalidating the Font.
+	Automatically adds fallback fonts such as Japanese, Chinese, and emoji.
 	*/
 	std::shared_ptr<Font> loadFont(const std::string& filename);
+	/** Loads and caches a Font without adding fallback fonts. */
+	std::shared_ptr<Font> loadFontWithoutFallbacks(const std::string& filename);
 	/** Loads and caches an Image from a file path.
 	Do not store this reference across screen frames, as the Window may have changed, invalidating the Image.
 	*/

@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+import json
+import sys
+
+
+def main() -> int:
+    args = sys.argv[1:]
+    raw = False
+    if args and args[0] == "-r":
+        raw = True
+        args = args[1:]
+    if len(args) != 2 or not args[0].startswith('.'):
+        print("jq shim only supports 'jq -r .field file'", file=sys.stderr)
+        return 1
+    query, filename = args
+    try:
+        with open(filename, 'r', encoding='utf-8') as fh:
+            data = json.load(fh)
+    except FileNotFoundError:
+        print(f"jq: {filename}: No such file or directory", file=sys.stderr)
+        return 1
+    except json.JSONDecodeError as exc:
+        print(f"jq: failed to parse {filename}: {exc}", file=sys.stderr)
+        return 1
+
+    current = data
+    for part in query.lstrip('.').split('.'):
+        if not part:
+            continue
+        if isinstance(current, dict) and part in current:
+            current = current[part]
+        else:
+            print(f"jq: query {query} not found", file=sys.stderr)
+            return 1
+
+    if isinstance(current, (dict, list)):
+        output = json.dumps(current)
+    else:
+        output = str(current)
+        if not raw:
+            output = json.dumps(current)
+    sys.stdout.write(f"{output}\n")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

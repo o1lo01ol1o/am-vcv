@@ -15,6 +15,8 @@
 #include <string>
 #include <stdexcept>
 
+#include <arch.hpp>
+
 
 /** Attribute for deprecated functions and symbols.
 E.g.
@@ -85,32 +87,24 @@ For example, to include a file "Test.dat" directly into your program binary, add
 
 to your Makefile and declare
 
-	BINARY(Test_dat);
+	BINARY(Test_dat)
 
-at the root of a .c or .cpp source file. Note that special characters are replaced with "_". Then use
+at the root of a .c or .cpp source file. Note that special characters like "." are replaced with "_". Then use
 
 	BINARY_START(Test_dat)
 	BINARY_END(Test_dat)
 
-to reference the data beginning and end as a void* array, and
+to reference the data beginning and end as an unsigned char* array, and
 
 	BINARY_SIZE(Test_dat)
 
 to get its size in bytes.
 */
-#if defined ARCH_MAC
-	// Use output from `xxd -i`
-	#define BINARY(sym) extern unsigned char sym[]; extern unsigned int sym##_len
-	#define BINARY_START(sym) ((const void*) sym)
-	#define BINARY_END(sym) ((const void*) sym + sym##_len)
-	#define BINARY_SIZE(sym) (sym##_len)
-#else
-	#define BINARY(sym) extern char _binary_##sym##_start, _binary_##sym##_end, _binary_##sym##_size
-	#define BINARY_START(sym) ((const void*) &_binary_##sym##_start)
-	#define BINARY_END(sym) ((const void*) &_binary_##sym##_end)
-	// The symbol "_binary_##sym##_size" doesn't seem to be valid after a plugin is dynamically loaded, so simply take the difference between the two addresses.
-	#define BINARY_SIZE(sym) ((size_t) (&_binary_##sym##_end - &_binary_##sym##_start))
-#endif
+// Use synbols generated from `xxd -i`
+#define BINARY(sym) extern "C" {extern const unsigned char sym[]; extern const unsigned int sym##_len;}
+#define BINARY_START(sym) (sym)
+#define BINARY_END(sym) (sym + sym##_len)
+#define BINARY_SIZE(sym) (sym##_len)
 
 
 /** Helpful user-defined literals for specifying exact integer and float types.

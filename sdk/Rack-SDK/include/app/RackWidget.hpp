@@ -41,6 +41,7 @@ struct RackWidget : widget::OpaqueWidget {
 	// Rack methods
 
 	widget::Widget* getModuleContainer();
+	widget::Widget* getPlugContainer();
 	widget::Widget* getCableContainer();
 	math::Vec getMousePos();
 
@@ -114,22 +115,29 @@ struct RackWidget : widget::OpaqueWidget {
 	void clearCablesAction();
 	/** Removes all cables connected to the port */
 	void clearCablesOnPort(PortWidget* port);
-	/** Adds a complete cable and adopts ownership.
+	/** Adds a cable and adopts ownership.
 	*/
 	void addCable(CableWidget* cw);
 	/** Removes cable and releases ownership to caller.
 	*/
 	void removeCable(CableWidget* cw);
-	CableWidget* getIncompleteCable();
-	/** Takes ownership of `cw` and adds it as a child if it isn't already. */
-	void setIncompleteCable(CableWidget* cw);
-	CableWidget* releaseIncompleteCable();
-	/** Returns the most recently added complete cable connected to the given Port, i.e. the top of the stack. */
+	/** Returns the top incomplete cable. Use getIncompleteCables() instead. */
+	DEPRECATED CableWidget* getIncompleteCable();
+	/** Returns the topmost plug stacked on the port. */
+	PlugWidget* getTopPlug(PortWidget* port);
+	/** Returns the cable with the topmost plug stacked on the port. */
 	CableWidget* getTopCable(PortWidget* port);
 	CableWidget* getCable(int64_t cableId);
+	CableWidget* getCable(PortWidget* outputPort, PortWidget* inputPort);
+	/** Returns all cables, complete and incomplete. */
+	std::vector<CableWidget*> getCables();
+	/** Returns all cables attached to 2 ports. */
 	std::vector<CableWidget*> getCompleteCables();
-	/** Returns all cables attached to port, complete or not. */
+	/** Returns all cables attached to less than 2 ports. */
+	std::vector<CableWidget*> getIncompleteCables();
+	/** Returns all cables attached to the port, complete or not. */
 	std::vector<CableWidget*> getCablesOnPort(PortWidget* port);
+	/** Returns all complete cables attached to the port. */
 	std::vector<CableWidget*> getCompleteCablesOnPort(PortWidget* port);
 	/** Returns but does not advance the next cable color. */
 	int getNextCableColorId();

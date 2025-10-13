@@ -17,29 +17,33 @@ struct SharedMutex {
 	pthread_rwlock_t rwlock;
 
 	SharedMutex() {
-		if (pthread_rwlock_init(&rwlock, NULL))
-			throw Exception("pthread_rwlock_init failed");
+		int err = pthread_rwlock_init(&rwlock, NULL);
+		(void) err;
+		assert(!err);
 	}
 	~SharedMutex() {
 		pthread_rwlock_destroy(&rwlock);
 	}
 
 	void lock() {
-		if (pthread_rwlock_wrlock(&rwlock))
-			throw Exception("pthread_rwlock_wrlock failed");
+		int err = pthread_rwlock_wrlock(&rwlock);
+		(void) err;
+		assert(!err);
 	}
 	/** Returns whether the lock was acquired. */
 	bool try_lock() {
 		return pthread_rwlock_trywrlock(&rwlock) == 0;
 	}
 	void unlock() {
-		if (pthread_rwlock_unlock(&rwlock))
-			throw Exception("pthread_rwlock_unlock failed");
+		int err = pthread_rwlock_unlock(&rwlock);
+		(void) err;
+		assert(!err);
 	}
 
 	void lock_shared() {
-		if (pthread_rwlock_rdlock(&rwlock))
-			throw Exception("pthread_rwlock_rdlock failed");
+		int err = pthread_rwlock_rdlock(&rwlock);
+		(void) err;
+		assert(!err);
 	}
 	/** Returns whether the lock was acquired. */
 	bool try_lock_shared() {

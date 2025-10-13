@@ -24,26 +24,44 @@ static const NVGcolor YELLOW = nvgRGB(0xff, 0xff, 0x00);
 static const NVGcolor WHITE = nvgRGB(0xff, 0xff, 0xff);
 
 
+/** Returns whether all RGBA color components are equal. */
 bool isEqual(NVGcolor a, NVGcolor b);
-/** Limits color components between 0 and 1. */
+/** Limits RGBA color components between 0 and 1. */
 NVGcolor clamp(NVGcolor a);
-/** Subtracts color components elementwise. */
+/** Subtracts RGB color components elementwise.
+Alpha value is copied from `a`.
+*/
 NVGcolor minus(NVGcolor a, NVGcolor b);
-/** Adds color components elementwise. */
+/** Adds RGB color components elementwise.
+Alpha value is copied from `a`.
+*/
 NVGcolor plus(NVGcolor a, NVGcolor b);
-/** Multiplies color components elementwise. */
+/** Multiplies RGB color components elementwise.
+Alpha value is copied from `a`.
+*/
 NVGcolor mult(NVGcolor a, NVGcolor b);
+/** Multiplies RGB color components by a scalar.
+Alpha value is untouched.
+*/
 NVGcolor mult(NVGcolor a, float x);
-/** Interpolates RGBA color values. */
+/** Interpolates RGBA color components. */
 NVGcolor lerp(NVGcolor a, NVGcolor b, float t);
-/** Screen blending with alpha compositing */
+/** Screen blending with alpha compositing.
+https://en.wikipedia.org/wiki/Blend_modes#Screen
+*/
 NVGcolor screen(NVGcolor a, NVGcolor b);
-/** Multiplies alpha value. */
+/** Multiplies alpha value by a scalar.
+RGB color components are untouched.
+*/
 NVGcolor alpha(NVGcolor a, float alpha);
-/** Converts from color hex string of the form "#RRGGBB" or "#RRGGBBAA".
+/** Converts from hex string of the form "#RRGGBB" or "#RRGGBBAA".
+Must include "#".
 Returns WHITE on error.
 */
 NVGcolor fromHexString(std::string s);
+/** Converts color to hex string of the form "#RRGGBB" if opaque or "#RRGGBBAA" if alpha < 255.
+Floating point color components are rounded to nearest 8-bit integer.
+*/
 std::string toHexString(NVGcolor c);
 
 

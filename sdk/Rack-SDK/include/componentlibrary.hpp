@@ -701,17 +701,6 @@ struct VCVSlider : app::SvgSlider {
 };
 using LEDSlider = VCVSlider;
 
-struct VCVSliderHorizontal : app::SvgSlider {
-	VCVSliderHorizontal() {
-		horizontal = true;
-		// TODO Fix SVG
-		setBackgroundSvg(Svg::load(asset::system("res/ComponentLibrary/VCVSliderHorizontal.svg")));
-		// TODO Fix positions
-		setHandlePos(mm2px(math::Vec(0.738, 0.738).plus(math::Vec(0, 2))), mm2px(math::Vec(22.078, 0.738).plus(math::Vec(0, 2))));
-	}
-};
-using LEDSliderHorizontal = VCVSliderHorizontal;
-
 /** An SvgSlider with an attached light.
 Construct with createLightParamCentered() helper function.
 */
@@ -759,18 +748,6 @@ struct LEDSliderRed : VCVLightSlider<RedLight> {};
 struct LEDSliderYellow : VCVLightSlider<YellowLight> {};
 struct LEDSliderBlue : VCVLightSlider<BlueLight> {};
 struct LEDSliderWhite : VCVLightSlider<WhiteLight> {};
-
-template <typename TLightBase = RedLight>
-struct VCVLightSliderHorizontal : LightSlider<VCVSliderHorizontal, TLightBase> {
-	VCVLightSliderHorizontal() {
-		// TODO Fix positions
-		this->light->box.size = mm2px(math::Vec(3.276, 1.524));
-		// TODO Fix SVG
-		this->setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/VCVSliderHorizontalHandle.svg")));
-	}
-};
-template <typename TLightBase = RedLight>
-using LEDLightSliderHorizontal = VCVLightSliderHorizontal<TLightBase>;
 
 
 ////////////////////

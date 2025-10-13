@@ -106,6 +106,7 @@ struct Engine {
 	Exclusively locks.
 	*/
 	void addModule(Module* module);
+	PRIVATE void addModule_NoLock(Module* module);
 	/** Removes a Module from the rack.
 	Exclusively locks.
 	*/
@@ -168,6 +169,7 @@ struct Engine {
 	Exclusively locks.
 	*/
 	void addCable(Cable* cable);
+	PRIVATE void addCable_NoLock(Cable* cable);
 	/** Removes a Cable from the rack.
 	Exclusively locks.
 	*/

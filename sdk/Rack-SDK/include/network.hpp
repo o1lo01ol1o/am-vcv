@@ -29,7 +29,7 @@ json_t* requestJson(Method method, const std::string& url, json_t* dataJ = NULL,
 /** Returns true if downloaded successfully.
 If `progress` is non-NULL, the value is updated from 0 to 1 while downloading.
 */
-bool requestDownload(const std::string& url, const std::string& filename, float* progress, const CookieMap& cookies = {});
+bool requestDownload(const std::string& url, const std::string& filename, float* progress = NULL, const CookieMap& cookies = {});
 /** URL-encodes a string. */
 std::string encodeUrl(const std::string& s);
 /** Returns the path portion of the URL.

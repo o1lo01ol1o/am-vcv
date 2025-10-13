@@ -17,7 +17,11 @@ Use this instead of GLFW_MOD_CONTROL, since Cmd should be used on Mac in place o
 	#define RACK_MOD_CTRL GLFW_MOD_CONTROL
 	#define RACK_MOD_CTRL_NAME "Ctrl"
 #endif
+
+#define RACK_MOD_SHIFT GLFW_MOD_SHIFT
 #define RACK_MOD_SHIFT_NAME "Shift"
+
+#define RACK_MOD_ALT GLFW_MOD_ALT
 #define RACK_MOD_ALT_NAME "Alt"
 
 /** Filters actual mod keys from the mod flags.
@@ -37,6 +41,21 @@ namespace widget {
 
 
 struct Widget;
+
+
+/** Returns the name of a GLFW key macro.
+Printable keys return the key string such as "Q", "=", "\t", etc.
+Letters are capitalized.
+Does not remap keys based on keyboard layout, so GLFW_KEY_Q always returns "Q".
+GLFW_KEY_SPACE returns "Space" translated to the current language.
+Non-printable characters return the name of the key in the current language.
+Key 0 returns "".
+*/
+std::string getKeyName(int key);
+/** Returns the name of a key command/chord/combo.
+For example, getKeyCommandName(GLFW_KEY_Q, GLFW_MOD_CONTROL) == "Ctrl+Q" translated to the current language.
+*/
+std::string getKeyCommandName(int key, int mods = 0);
 
 
 /** A per-event state shared and writable by all widgets that recursively handle an event. */
@@ -148,7 +167,7 @@ struct EventState {
 	bool handleHover(math::Vec pos, math::Vec mouseDelta);
 	bool handleLeave();
 	bool handleScroll(math::Vec pos, math::Vec scrollDelta);
-	bool handleText(math::Vec pos, int codepoint);
+	bool handleText(math::Vec pos, uint32_t codepoint);
 	bool handleKey(math::Vec pos, int key, int scancode, int action, int mods);
 	bool handleDrop(math::Vec pos, const std::vector<std::string>& paths);
 	bool handleDirty();

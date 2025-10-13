@@ -30,4 +30,4 @@ else
 $(error Could not determine operating system of $(MACHINE))
 endif
 
-ARCH_NAME := $(ARCH_OS)-$(ARCH_CPU)
+ARCH_NAME = $(ARCH_OS)-$(ARCH_CPU)

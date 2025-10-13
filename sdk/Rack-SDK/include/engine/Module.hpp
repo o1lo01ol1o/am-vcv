@@ -469,6 +469,8 @@ struct Module {
 	PRIVATE int meterIndex();
 	PRIVATE void doProcess(const ProcessArgs& args);
 	PRIVATE static void jsonStripIds(json_t* rootJ);
+	/** Sets module of expander and dispatches ExpanderChangeEvent if changed. */
+	PRIVATE void setExpanderModule(Module* module, uint8_t side);
 };
 
 
